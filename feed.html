@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            padding-bottom: 32px;
+        }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        
+        /* Feed Header (Recreación de FeedHeader) */
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Action Cards (Recreación de FeedActionCards) */
+        .action-card {
+            background-color: var(--light-grey);
+            border: 1px solid var(--medium-grey);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .action-card:active { background-color: var(--medium-grey); }
+
+        /* News Card (Recreación de NewsCard) */
+        .news-card {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, #004d4d 100%);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            margin: 0 20px 12px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .news-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        /* Report Card (Recreación de ReportCard) */
+        .report-card {
+            background-color: #ffffff;
+            border: 1px solid var(--medium-grey);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 0 20px 12px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .report-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light-grey);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-teal);
+        }
+
+        .report-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-resolved { background-color: #d4edda; color: #155724; }
+
+        .report-actions {
+            border-top: 1px solid var(--medium-grey);
+            padding-top: 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--dark-grey);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER (FeedHeader) -->
+        <div class="feed-header">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-grid-fill text-teal fs-4 me-2"></i>
+                <h4 class="mb-0 fw-bold">Inicio</h4>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="mx-1">•</span>
+                <span id="headerStreak">0</span>
+                <span class="ms-1">🔥</span>
+            </div>
+        </div>
+
+        <!-- Sube un poco el contenido por el padding del body -->
+        <div class="pt-2"></div>
+
+        <!-- SEARCH AND ACTION CARDS (FeedActionCards) -->
+        <div class="px-4 mb-4">
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="action-card bg-light-grey d-flex justify-content-between" onclick="showToast('Abriendo búsqueda...')">
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="bi bi-search me-2"></i>
+                            <span style="font-size: 14px;">Buscar reportes o noticias...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="action-card justify-content-center border-teal text-teal" style="border-color: var(--primary-teal);" onclick="showToast('Creando nuevo reporte...')">
+                        <i class="bi bi-plus-circle-fill me-2"></i>
+                        <span class="fw-bold" style="font-size: 14px;">Reportar</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="action-card justify-content-center" onclick="showToast('Abriendo mapa...')">
+                        <i class="bi bi-map-fill text-secondary me-2"></i>
+                        <span class="fw-bold text-dark" style="font-size: 14px;">Mapa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WHAT'S HAPPENING (News Section) -->
+        <div class="px-4 mb-3">
+            <h5 class="fw-bold mb-0" style="font-size: 18px;">What's happening in your neighborhood?</h5>
+        </div>
+        
+        <!-- Contenedor dinámico de Noticias -->
+        <div id="newsContainer"></div>
+
+        <!-- RECENT REPORTS -->
+        <div class="px-4 mt-4 mb-3">
+            <h5 class="fw-bold mb-0" style="font-size: 18px;">Recent Reports</h5>
+        </div>
+
+        <!-- Contenedor dinámico de Reportes -->
+        <div id="reportsContainer"></div>
+
+    </div>
+
+    <!-- SnackBar (Toast) para simular interacciones -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="actionSnackBar" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="snackBarMessage">Mensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simulando el MockData
+        const mockUser = {
+            coins: 1350,
+            streak: 5
+        };
+
+        const mockNews = [
+            { 
+                category: "Aviso Comunitario", 
+                title: "Reparación de luminarias en el parque principal", 
+                time: "Hace 2h",
+                icon: "bi-lightbulb-fill"
+            },
+            { 
+                category: "Tráfico", 
+                title: "Cierre parcial por obras en la Avenida Juárez", 
+                time: "Hace 5h",
+                icon: "bi-cone-striped"
+            }
+        ];
+
+        const mockReports = [
+            {
+                user: "María G.",
+                time: "Hace 15 min",
+                title: "Bache profundo en la calle 45",
+                description: "Hay un bache muy grande que está dañando los autos. Por favor precaución al pasar.",
+                status: "Pendiente",
+                likes: 12,
+                comments: 3
+            },
+            {
+                user: "Carlos M.",
+                time: "Hace 1 hora",
+                title: "Fuga de agua potable",
+                description: "Se está desperdiciando mucha agua en la esquina, parece ser una tubería rota.",
+                status: "Atendido",
+                likes: 45,
+                comments: 8
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Llenar datos de cabecera
+            document.getElementById('headerCoins').textContent = mockUser.coins;
+            document.getElementById('headerStreak').textContent = mockUser.streak;
+
+            // Renderizar Noticias (NewsCard)
+            const newsContainer = document.getElementById('newsContainer');
+            mockNews.forEach(news => {
+                newsContainer.innerHTML += `
+                    <div class="news-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="news-badge">
+                                <i class="bi ${news.icon} me-1"></i> ${news.category}
+                            </div>
+                            <small class="text-white-50" style="font-size: 11px;">${news.time}</small>
+                        </div>
+                        <h6 class="fw-bold mb-0 lh-base">${news.title}</h6>
+                    </div>
+                `;
+            });
+
+            // Renderizar Reportes (ReportCard)
+            const reportsContainer = document.getElementById('reportsContainer');
+            mockReports.forEach(report => {
+                const statusClass = report.status === 'Atendido' ? 'status-resolved' : 'status-pending';
+                
+                reportsContainer.innerHTML += `
+                    <div class="report-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="report-avatar">
+                                    <i class="bi bi-person-fill fs-5"></i>
+                                </div>
+                                <div class="ms-2">
+                                    <div class="fw-bold" style="font-size: 13px;">${report.user}</div>
+                                    <div class="text-muted" style="font-size: 11px;">${report.time}</div>
+                                </div>
+                            </div>
+                            <div class="report-status ${statusClass}">
+                                ${report.status}
+                            </div>
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size: 15px;">${report.title}</h6>
+                        <p class="text-muted mb-0" style="font-size: 13px;">${report.description}</p>
+                        
+                        <div class="report-actions">
+                            <button class="action-btn" onclick="showToast('Diste Me gusta')">
+                                <i class="bi bi-arrow-up-circle fs-5"></i> ${report.likes}
+                            </button>
+                            <button class="action-btn" onclick="showToast('Abriendo comentarios...')">
+                                <i class="bi bi-chat-square-text fs-5"></i> ${report.comments}
+                            </button>
+                            <button class="action-btn" onclick="showToast('Compartiendo...')">
+                                <i class="bi bi-share fs-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        // Utilidad global para los Toast (SnackBar)
+        const toastEl = document.getElementById('actionSnackBar');
+        const snackBarMessage = document.getElementById('snackBarMessage');
+        let snackBarInstance;
+
+        window.showToast = function(message) {
+            snackBarMessage.textContent = message;
+            if (!snackBarInstance) {
+                snackBarInstance = new bootstrap.Toast(toastEl, { delay: 2000 });
+            }
+            snackBarInstance.show();
+        };
+    </script>
+</body>
+</html>

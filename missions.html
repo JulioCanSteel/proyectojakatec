@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            padding-bottom: 32px;
+        }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        
+        /* Tarjetas de misiones y estadísticas */
+        .custom-card {
+            background-color: var(--light-grey);
+            border-radius: 16px;
+            border: 1px solid var(--medium-grey);
+            padding: 16px;
+        }
+
+        /* Barras de progreso */
+        .progress {
+            height: 6px; /* Equivalente al minHeight: 6 de Flutter */
+            background-color: var(--medium-grey);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-teal);
+            border-radius: 8px;
+        }
+
+        /* Logros (Badges) */
+        .achievement-box {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 193, 7, 0.1); /* accentAmber.withValues(alpha: 0.1) */
+            border-radius: 12px;
+            border: 2px solid var(--accent-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 4px auto;
+        }
+
+        .achievement-label {
+            font-size: 10px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-trophy-fill text-teal fs-3 me-2"></i> <!-- Equivalente a Icons.emoji_events -->
+                <h4 class="mb-0 fw-bold">Misiones</h4>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="ms-1">🪙</span>
+            </div>
+        </header>
+
+        <!-- MISIONES DIARIAS -->
+        <div class="px-4 mb-4 mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Misiones Diarias</h5>
+                <small class="text-muted" style="font-size: 12px;">Reinicia en 4h</small>
+            </div>
+            
+            <div id="dailyMissionsContainer">
+                <!-- Las misiones se renderizarán aquí mediante JavaScript -->
+            </div>
+        </div>
+
+        <!-- DESAFÍOS SEMANALES -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Desafíos Semanales</h5>
+            
+            <!-- Desafío 1 -->
+            <div class="custom-card mb-3">
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-teal fs-4"></i> <!-- Equivalente a Icons.report_problem -->
+                    <div class="ms-3 flex-grow-1">
+                        <h6 class="fw-bold mb-1">Reporta 5 problemas</h6>
+                        <small class="text-muted" style="font-size: 12px;">Contribuye reportando problemas en tu comunidad</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2" style="font-size: 12px;">
+                    <span class="text-muted fw-medium">3 / 5</span>
+                    <div class="d-flex align-items-center text-muted">
+                        <i class="bi bi-coin text-warning me-1"></i>
+                        <span>250</span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 60%"></div> <!-- 3/5 = 60% -->
+                </div>
+            </div>
+
+            <!-- Desafío 2 -->
+            <div class="custom-card">
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-heart-fill text-teal fs-4"></i> <!-- Equivalente a Icons.favorite -->
+                    <div class="ms-3 flex-grow-1">
+                        <h6 class="fw-bold mb-1">Gana 100 likes</h6>
+                        <small class="text-muted" style="font-size: 12px;">Consigue likes en tus reportes o comentarios</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2" style="font-size: 12px;">
+                    <span class="text-muted fw-medium">87 / 100</span>
+                    <div class="d-flex align-items-center text-muted">
+                        <i class="bi bi-coin text-warning me-1"></i>
+                        <span>150</span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 87%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGROS DESBLOQUEADOS -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Logros Desbloqueados</h5>
+            <div class="d-flex flex-wrap gap-3" id="achievementsContainer">
+                <!-- Se generan dinámicamente con JS para simular el loop "for (int i = 0; i < 8; i++)" -->
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="px-4 mb-4">
+            <div class="custom-card p-4">
+                <div class="d-flex justify-content-evenly text-center">
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statCompletadas">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Completadas</div>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statSemana">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Esta semana</div>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statGanancias">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Total ganancias</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simulación de los datos (MockData.currentUser)
+        const mockUser = {
+            coins: 1250,
+            contributions: 24,
+            level: 3 
+        };
+
+        // Simulación de los datos (MockData.dailyMissions)
+        const dailyMissions = [
+            { title: "Inicia sesión", progress: 1, total: 1, coinsReward: 10, icon: "bi-box-arrow-in-right" },
+            { title: "Comenta en 2 reportes", progress: 1, total: 2, coinsReward: 20, icon: "bi-chat-text-fill" },
+            { title: "Vota 5 propuestas", progress: 3, total: 5, coinsReward: 50, icon: "bi-check-circle-fill" }
+        ];
+
+        // Datos del array de logros hardcodeados en el código Flutter
+        const achievementsList = [
+            { emoji: '🌱', label: 'Primer paso' },
+            { emoji: '🔥', label: 'En racha' },
+            { emoji: '👍', label: 'Me gusta' },
+            { emoji: '💬', label: 'Comentarista' },
+            { emoji: '🎯', label: 'Puntería' },
+            { emoji: '⭐', label: 'Famoso' },
+            { emoji: '🏆', label: 'Campeón' },
+            { emoji: '🎉', label: 'Celebración' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Llenar datos de usuario
+            document.getElementById('headerCoins').textContent = mockUser.coins;
+            document.getElementById('statCompletadas').textContent = mockUser.contributions;
+            document.getElementById('statSemana').textContent = mockUser.level;
+            document.getElementById('statGanancias').textContent = mockUser.coins;
+
+            // Renderizar Misiones Diarias
+            const missionsContainer = document.getElementById('dailyMissionsContainer');
+            dailyMissions.forEach((mission, index) => {
+                const progressPercentage = (mission.progress / mission.total) * 100;
+                const isLast = index === dailyMissions.length - 1;
+                
+                const cardHtml = `
+                    <div class="custom-card ${isLast ? '' : 'mb-3'}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="bi ${mission.icon} text-secondary fs-5"></i>
+                                <h6 class="fw-bold mb-0 ms-3">${mission.title}</h6>
+                            </div>
+                            <span class="text-muted fw-medium" style="font-size: 12px;">${mission.progress}/${mission.total}</span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-coin text-warning" style="font-size: 14px;"></i>
+                            <span class="text-muted ms-1" style="font-size: 12px;">+${mission.coinsReward} coins</span>
+                        </div>
+                        
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: ${progressPercentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                missionsContainer.innerHTML += cardHtml;
+            });
+
+            // Renderizar Logros Desbloqueados
+            const achievementsContainer = document.getElementById('achievementsContainer');
+            achievementsList.forEach(ach => {
+                const badgeHtml = `
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="achievement-box">${ach.emoji}</div>
+                        <div class="achievement-label text-muted">${ach.label}</div>
+                    </div>
+                `;
+                achievementsContainer.innerHTML += badgeHtml;
+            });
+        });
+    </script>
+</body>
+</html>

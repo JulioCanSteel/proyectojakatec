@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Progreso</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --primary-dark-teal: #004d4d;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            padding-bottom: 32px;
+        }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        
+        /* Tarjeta de Bienvenida (Gradiente) */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            position: relative;
+        }
+
+        .level-badge {
+            background-color: var(--accent-amber);
+            border-radius: 12px;
+            padding: 6px 12px;
+            color: black;
+            display: inline-block;
+            font-size: 13px;
+        }
+
+        .avatar-box-pet {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-box-user {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 12px;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .connector-line {
+            position: absolute;
+            left: 110px;
+            top: 20px;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent-amber);
+            border-radius: 2px;
+        }
+
+        /* Tarjetas de Racha y Misiones */
+        .custom-card {
+            background-color: var(--light-grey);
+            border-radius: 16px;
+            border: 1px solid var(--medium-grey);
+            padding: 16px;
+        }
+
+        .fire-icon-box {
+            width: 50px;
+            height: 50px;
+            background-color: #fff3cd; /* amber[100] */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-box {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .day-completed { background-color: var(--accent-amber); color: black; }
+        .day-pending { background-color: var(--medium-grey); color: var(--dark-grey); }
+
+        /* Barras de progreso */
+        .progress {
+            height: 6px;
+            background-color: var(--medium-grey);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-teal);
+            border-radius: 8px;
+        }
+
+        /* Scroll Horizontal para Personajes */
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .character-item {
+            min-width: 120px;
+            margin-right: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .item-unlocked { background: linear-gradient(135deg, #616161 0%, #212121 100%); }
+        .item-locked { background: linear-gradient(135deg, #bdbdbd 0%, #757575 100%); }
+
+        .price-badge {
+            background-color: #fff3cd;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .level-lock-badge {
+            background-color: var(--medium-grey);
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* Estadísticas */
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-teal);
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-house-door-fill text-teal fs-3 me-2"></i>
+                <h4 class="mb-0 fw-bold">Mi Progreso</h4>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="mx-1">•</span>
+                <span id="headerStreak">0</span>
+                <span class="ms-1">🔥</span>
+            </div>
+        </header>
+
+        <!-- TARJETA DE BIENVENIDA -->
+        <div class="px-4 mb-4 mt-3">
+            <div class="welcome-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="font-space fw-bold text-white-50 mb-1" style="font-size: 11px; letter-spacing: 0.5px;">CIUDADANO EJEMPLAR</div>
+                    <h2 class="fw-bold text-white mb-3" style="font-size: 24px;" id="welcomeName">¡Hola!</h2>
+                    <div class="level-badge font-space fw-bold" id="welcomeLevel">Nivel 0</div>
+                </div>
+                
+                <div class="d-flex align-items-center position-relative">
+                    <div class="connector-line d-none d-sm-block"></div>
+                    <div class="avatar-box-pet me-2">
+                        <i class="bi bi-robot text-white-50" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="avatar-box-user">
+                        <i class="bi bi-person-fill text-teal" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RACHA -->
+        <div class="px-4 mb-4">
+            <div class="custom-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="fire-icon-box">
+                        <i class="bi bi-fire text-warning" style="font-size: 28px;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <h6 class="fw-bold mb-0">¡Llevas <span id="streakDays">0</span> días seguidos!</h6>
+                        <small class="text-muted" style="font-size: 12px;">Sigue así para ganar el café semanal</small>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center" id="daysContainer">
+                    <!-- Los días se generan con JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MISIONES DIARIAS -->
+        <div class="px-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Misiones Diarias</h5>
+                <small class="text-muted" style="font-size: 12px;">Reinicia en 4h</small>
+            </div>
+            
+            <div id="missionsContainer">
+                <!-- Las misiones se renderizan aquí -->
+            </div>
+        </div>
+
+        <!-- TUNEO DE PERSONAJE -->
+        <div class="mb-4">
+            <div class="px-4 d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Tuneo de Personaje</h5>
+                <span class="text-teal font-space fw-bold" style="font-size: 12px; cursor: pointer;">Ver todo ></span>
+            </div>
+            
+            <div class="px-4 horizontal-scroll" id="characterItemsContainer">
+                <!-- Los ítems se renderizan aquí -->
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="px-4 mb-5 pb-3">
+            <div class="d-flex justify-content-evenly text-center">
+                <div>
+                    <div class="stat-number mb-1" id="statAportes">0</div>
+                    <div class="text-muted fw-medium" style="font-size: 12px;">APORTES</div>
+                </div>
+                <div>
+                    <div class="stat-number mb-1" id="statLogros">0</div>
+                    <div class="text-muted fw-medium" style="font-size: 12px;">LOGROS</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simulación de los datos (MockData)
+        const mockUser = {
+            name: "Julio",
+            coins: 1500,
+            streak: 4,
+            level: 5
+        };
+
+        const dailyMissions = [
+            { title: "Recoge 5 basuras", progress: 2, total: 5, coinsReward: 30, icon: "bi-trash-fill" },
+            { title: "Reporta un bache", progress: 1, total: 1, coinsReward: 50, icon: "bi-exclamation-triangle-fill" }
+        ];
+
+        const characterItems = [
+            { isUnlocked: true, name: "Gorra Urbana", coins: null, level: null },
+            { isUnlocked: false, name: "Lentes Cool", coins: 200, level: null },
+            { isUnlocked: false, name: "Chaqueta Élite", coins: null, level: "Nivel 10" },
+            { isUnlocked: false, name: "Tenis Flúor", coins: 500, level: null }
+        ];
+
+        const mockStats = {
+            aportes: 42,
+            logros: 15
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar cabecera y tarjeta de bienvenida
+            document.getElementById('headerCoins').textContent = mockUser.coins;
+            document.getElementById('headerStreak').textContent = mockUser.streak;
+            document.getElementById('welcomeName').textContent = `¡Hola, ${mockUser.name}!`;
+            document.getElementById('welcomeLevel').textContent = `Nivel ${mockUser.level}`;
+            
+            // Cargar estadísticas
+            document.getElementById('statAportes').textContent = mockStats.aportes;
+            document.getElementById('statLogros').textContent = mockStats.logros;
+
+            // Cargar Racha
+            document.getElementById('streakDays').textContent = mockUser.streak;
+            const daysContainer = document.getElementById('daysContainer');
+            const daysLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            
+            daysLetters.forEach((day, index) => {
+                const isCompleted = index < mockUser.streak;
+                const statusClass = isCompleted ? 'day-completed' : 'day-pending';
+                daysContainer.innerHTML += `
+                    <div class="mx-1 font-space day-box ${statusClass}">
+                        ${day}
+                    </div>
+                `;
+            });
+
+            // Cargar Misiones Diarias
+            const missionsContainer = document.getElementById('missionsContainer');
+            dailyMissions.forEach((mission, index) => {
+                const progressPercentage = (mission.progress / mission.total) * 100;
+                const isLast = index === dailyMissions.length - 1;
+                
+                missionsContainer.innerHTML += `
+                    <div class="custom-card ${isLast ? '' : 'mb-3'}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="bi ${mission.icon} text-secondary fs-5"></i>
+                                <h6 class="fw-bold mb-0 ms-3">${mission.title}</h6>
+                            </div>
+                            <span class="text-muted fw-medium" style="font-size: 12px;">${mission.progress}/${mission.total}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-coin text-warning" style="font-size: 14px;"></i>
+                            <span class="text-muted ms-1" style="font-size: 12px;">+${mission.coinsReward} coins</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: ${progressPercentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Cargar Tuneo de Personaje
+            const itemsContainer = document.getElementById('characterItemsContainer');
+            characterItems.forEach(item => {
+                const bgClass = item.isUnlocked ? 'item-unlocked' : 'item-locked';
+                
+                let badgeHtml = '';
+                if (item.coins !== null) {
+                    badgeHtml = `
+                        <div class="price-badge d-flex align-items-center">
+                            <i class="bi bi-coin text-warning me-1"></i>
+                            <span class="fw-medium">${item.coins}</span>
+                        </div>
+                    `;
+                } else if (item.level !== null) {
+                    badgeHtml = `
+                        <div class="level-lock-badge text-muted d-flex align-items-center">
+                            <i class="bi bi-lock-fill me-1"></i>
+                            <span class="fw-medium">${item.level}</span>
+                        </div>
+                    `;
+                } else {
+                    badgeHtml = `<div style="height: 24px;"></div>`; // Spacer for alignment
+                }
+
+                itemsContainer.innerHTML += `
+                    <div class="character-item">
+                        <div class="item-box ${bgClass}">
+                            <i class="bi bi-bag-fill text-white fs-1"></i>
+                        </div>
+                        <div class="text-muted fw-medium mb-2 text-center" style="font-size: 12px; height: 18px;">${item.name}</div>
+                        ${badgeHtml}
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
