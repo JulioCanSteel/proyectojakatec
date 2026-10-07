@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Mi Progreso</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --primary-dark-teal: #004d4d;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+        body {
+            padding-bottom: 80px;
+            }
+
+            .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            z-index: 1000;
+            }
+
+            .bottom-menu a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #6c757d;
+            font-size: 11px;
+            text-decoration: none;
+            }
+
+            .bottom-menu i {
+            font-size: 20px;
+            }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        
+        /* Tarjeta de Bienvenida (Gradiente) */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            position: relative;
+        }
+
+        .level-badge {
+            background-color: var(--accent-amber);
+            border-radius: 12px;
+            padding: 6px 12px;
+            color: black;
+            display: inline-block;
+            font-size: 13px;
+        }
+
+        .avatar-box-pet {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-box-user {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 12px;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .connector-line {
+            position: absolute;
+            left: 110px;
+            top: 20px;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent-amber);
+            border-radius: 2px;
+        }
+
+        /* Tarjetas de Racha y Misiones */
+        .custom-card {
+            background-color: var(--light-grey);
+            border-radius: 16px;
+            border: 1px solid var(--medium-grey);
+            padding: 16px;
+        }
+
+        .fire-icon-box {
+            width: 50px;
+            height: 50px;
+            background-color: #fff3cd; /* amber[100] */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-box {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .day-completed { background-color: var(--accent-amber); color: black; }
+        .day-pending { background-color: var(--medium-grey); color: var(--dark-grey); }
+
+        /* Barras de progreso */
+        .progress {
+            height: 6px;
+            background-color: var(--medium-grey);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-teal);
+            border-radius: 8px;
+        }
+
+        /* Scroll Horizontal para Personajes */
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .character-item {
+            min-width: 120px;
+            margin-right: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .item-unlocked { background: linear-gradient(135deg, #616161 0%, #212121 100%); }
+        .item-locked { background: linear-gradient(135deg, #bdbdbd 0%, #757575 100%); }
+
+        .price-badge {
+            background-color: #fff3cd;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .level-lock-badge {
+            background-color: var(--medium-grey);
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* Estadísticas */
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-teal);
+            line-height: 1;
+        }
+        </style>
+        <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+<nav class="bottom-menu"></nav>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-house-door-fill text-teal fs-3 me-2"></i>
+                <div>
+                    <span class="app-brand">HeroesMX</span>
+                    <h4 class="mb-0 fw-bold">Mi Progreso</h4>
+                </div>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="mx-1">•</span>
+                <span id="headerStreak">0</span>
+                <span class="ms-1">🔥</span>
+            </div>
+        </header>
+
+        <!-- TARJETA DE BIENVENIDA -->
+        <div class="px-4 mb-4 mt-3">
+            <div class="welcome-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="font-space fw-bold text-white-50 mb-1" style="font-size: 11px; letter-spacing: 0.5px;">CIUDADANO EJEMPLAR</div>
+                    <h2 class="fw-bold text-white mb-3" style="font-size: 24px;" id="welcomeName">¡Hola!</h2>
+                    <div class="level-badge font-space fw-bold" id="welcomeLevel">Nivel 0</div>
+                </div>
+                
+                <div class="d-flex align-items-center position-relative">
+                    <div class="connector-line d-none d-sm-block"></div>
+                    <div class="avatar-box-pet me-2">
+                        <i class="bi bi-robot text-white-50" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="avatar-box-user">
+                        <i class="bi bi-person-fill text-teal" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RACHA -->
+        <div class="px-4 mb-4">
+            <div class="custom-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="fire-icon-box">
+                        <i class="bi bi-fire text-warning" style="font-size: 28px;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <h6 class="fw-bold mb-0">¡Llevas <span id="streakDays">0</span> días seguidos!</h6>
+                        <small class="text-muted" style="font-size: 12px;">Sigue así para ganar el café semanal</small>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center" id="daysContainer">
+                    <!-- Los días se generan con JS -->
+                </div>
+            </div>
+        </div>
+
+        <section class="px-4 mb-4" aria-labelledby="goalTitle">
+            <div class="custom-card">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-1" id="goalTitle">Objetivo diario</h5>
+                        <p class="text-muted small mb-0">Define cuántos puntos quieres alcanzar cada día.</p>
+                    </div>
+                    <div class="fw-bold text-teal text-nowrap"><span id="todayPoints">0</span> / <span id="goalDisplay">30</span> pts</div>
+                </div>
+                <div class="progress mt-3" aria-label="Avance hacia el objetivo diario">
+                    <div class="progress-bar" id="dailyGoalBar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <form id="goalForm" class="d-flex flex-wrap align-items-end gap-2 mt-3">
+                    <div>
+                        <label for="dailyGoalInput" class="form-label small fw-semibold mb-1">Meta en puntos</label>
+                        <input class="form-control form-control-sm" id="dailyGoalInput" type="number" min="10" max="200" step="5" value="30" required>
+                    </div>
+                    <button class="btn btn-teal btn-sm" type="submit">Guardar objetivo</button>
+                    <span class="small text-muted" id="goalStatus" aria-live="polite"></span>
+                </form>
+            </div>
+        </section>
+
+        <section class="px-4 mb-4" aria-labelledby="weekTitle">
+            <div class="custom-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1" id="weekTitle">Actividad semanal</h5>
+                        <p class="text-muted small mb-0"><span id="weeklyPoints">0</span> puntos en los últimos 7 días</p>
+                    </div>
+                    <span class="small text-muted"><span id="weeklyMissionCount">0</span> misiones</span>
+                </div>
+                <div class="d-flex justify-content-center" id="daysContainer" aria-label="Días con actividad esta semana"></div>
+            </div>
+        </section>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="px-4 mb-5 pb-3">
+            <div class="d-flex justify-content-evenly text-center">
+                <div>
+                    <div class="stat-number mb-1" id="statAportes">0</div>
+                    <div class="text-muted fw-medium" style="font-size: 12px;">APORTES</div>
+                </div>
+                <div>
+                    <div class="stat-number mb-1" id="statLogros">0</div>
+                    <div class="text-muted fw-medium" style="font-size: 12px;">LOGROS</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const dashboard = await window.CivicApp.loadDashboard();
+                const { stats, streak } = dashboard;
+                document.getElementById('statAportes').textContent = stats.contributions;
+                document.getElementById('statLogros').textContent = dashboard.achievements.length;
+                document.getElementById('todayPoints').textContent = stats.today_points;
+                document.getElementById('goalDisplay').textContent = stats.daily_goal;
+                document.getElementById('dailyGoalInput').value = stats.daily_goal;
+                document.getElementById('dailyGoalBar').style.width = `${stats.goal_percent}%`;
+                document.getElementById('weeklyPoints').textContent = stats.weekly_points;
+                document.getElementById('weeklyMissionCount').textContent = stats.weekly_missions;
+                window.CivicApp.renderWeek(document.getElementById('daysContainer'), streak.week);
+                document.getElementById('goalForm').addEventListener('submit', saveDailyGoal);
+            } catch (error) {
+                window.CivicApp.showMessage(error.message);
+            }
+        });
+
+        async function saveDailyGoal(event) {
+            event.preventDefault();
+            const input = document.getElementById('dailyGoalInput');
+            const status = document.getElementById('goalStatus');
+            const goal = Number(input.value);
+            if (!Number.isInteger(goal) || goal < 10 || goal > 200) {
+                status.textContent = 'Elige una meta entre 10 y 200 puntos.';
+                return;
+            }
+            try {
+                await window.CivicApi.updateDailyGoal(goal);
+                const dashboard = await window.CivicApp.loadDashboard();
+                document.getElementById('goalDisplay').textContent = dashboard.stats.daily_goal;
+                document.getElementById('dailyGoalBar').style.width = `${dashboard.stats.goal_percent}%`;
+                status.textContent = 'Objetivo guardado.';
+            } catch (error) {
+                status.textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>

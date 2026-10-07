@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#f8f9ff;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#004ac6", "primary-fixed": "#dbe1ff", "outline": "#737686", "tertiary-fixed": "#ffdad7", "secondary-fixed": "#dae2fd", "primary-fixed-dim": "#b4c5ff", "secondary-fixed-dim": "#bec6e0", "surface-variant": "#d3e4fe", "surface": "#f8f9ff", "on-primary-fixed-variant": "#003ea8", "inverse-surface": "#213145", "error": "#ba1a1a", "primary-container": "#2563eb", "background": "#f8f9ff", "on-secondary-container": "#5c647a", "on-surface-variant": "#434655", "on-secondary": "#ffffff", "surface-dim": "#cbdbf5", "on-background": "#0b1c30", "secondary-container": "#dae2fd", "on-tertiary-fixed-variant": "#930013", "surface-container-highest": "#d3e4fe", "on-primary": "#ffffff", "tertiary-fixed-dim": "#ffb3ad", "on-primary-container": "#eeefff", "secondary": "#565e74", "on-secondary-fixed-variant": "#3f465c", "on-surface": "#0b1c30", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#410004", "surface-container-high": "#dce9ff", "tertiary-container": "#cf2c30", "inverse-primary": "#b4c5ff", "error-container": "#ffdad6", "on-error": "#ffffff", "surface-container-low": "#eff4ff", "on-tertiary": "#ffffff", "on-primary-fixed": "#00174b", "surface-bright": "#f8f9ff", "surface-tint": "#0053db", "surface-container": "#e5eeff", "tertiary": "#ab0b1c", "inverse-on-surface": "#eaf1ff", "outline-variant": "#c3c6d7", "on-tertiary-container": "#ffecea", "on-error-container": "#93000a", "on-secondary-fixed": "#131b2e" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "gutter-mobile": "0.75rem", "margin": "1.5rem", "space-lg": "1.5rem", "space-xl": "2rem", "space-md": "1rem", "gutter": "1rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin-mobile": "1rem" }, fontFamily: { "headline-sm": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"], "label-lg": ["Inter"], "body-md": ["Inter"], "display-lg-mobile": ["Inter"], "body-lg": ["Inter"], "display-lg": ["Inter"], "title-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "label-sm": ["Inter"] }, fontSize: { "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "display-lg": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between"><div class="flex items-center gap-space-xs"><img alt="SIASE Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjcXB6cT3X14QmTwCJsSC2SktXQV0oQgnX1UBSfJRK8U1g0iWuMIWFX3-HHCjw24zjDPrFGiwkGU4iZTkGcT5QVOZ3yR5Xb7IHfEgfsf54-lt5xFKE773gNR4u4gVqxXp6Hjw7CphsJ2JyNLyGihi6v2txW3IfMmDr11WRx3nCKFOVpYfMMk7dy_Kl7UOnbCPa7JHFyKPdNCkPn1OM-R5_Ky9jErnU5GB_YuUnUA"/><div class="flex flex-col ml-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">SIASE</span><span class="font-title-md text-title-md leading-none text-on-surface">Ruta Segura</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notificaciones" class="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors relative"><span class="material-symbols-outlined text-[24px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface"></span></button><a class="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px]" data-path="mi-perfil" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBi-lsgLMixyBp8pw2TONXYpOSd7Kfbz4jjoD9fIUL8sJgDuXhk2Z96iQke00nJBPQQI_9kO4P1P7We4og0DW-e--doi0cS59zemtckYxjXEf5ZZKh0vRlNskNcoz5J2HCNzLOL5msj6tfGkTSKVTs8aIGRPNZ5C7FEg9yXUqyAD05o4d2MCfTzppw3LAWI3tJ3Gu91WeB2VAqxNCzB2ud8XzMCx5aNqgRP0SK_VQ"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full px-gutter-mobile space-y-space-md">
+<!-- Algorithmic Safe Route Header Metric Bar -->
+<div class="bg-primary-container text-on-primary-container p-space-md rounded-xl shadow-md flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest/20 flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[24px]">verified_user</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary-fixed">Algoritmo Activo</span>
+<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-surface-container-lowest text-primary">C5 + SIASE</span>
+</div>
+<p class="font-headline-sm text-headline-sm text-on-primary mt-0.5">Optimización λ(Riesgo)</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm block opacity-80">Seguridad Media</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-on-primary">94.2%</span>
+</div>
+</div>
+<!-- Origin / Destination Inputs & Transit Selector -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm space-y-space-sm">
+<div class="relative flex flex-col space-y-space-xs">
+<!-- Visual Connector Line between points -->
+<div class="absolute left-4 top-5 bottom-5 w-0.5 bg-secondary-fixed"></div>
+<!-- Origin -->
+<div class="flex items-center gap-space-sm relative z-10">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">my_location</span>
+</div>
+<div class="flex-1 bg-surface-container-low px-space-md py-2.5 rounded-lg flex items-center justify-between">
+<div class="min-w-0 pr-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Punto de partida</span>
+<span class="font-title-md text-title-md text-on-surface truncate block">Metro Insurgentes</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span>
+</div>
+</div>
+<!-- Destination -->
+<div class="flex items-center gap-space-sm relative z-10">
+<div class="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">pin_drop</span>
+</div>
+<div class="flex-1 bg-surface-container px-space-md py-2.5 rounded-lg flex items-center justify-between">
+<div class="min-w-0 pr-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Destino</span>
+<span class="font-title-md text-title-md text-on-surface truncate block">Parque México, Condesa</span>
+</div>
+<button aria-label="Cambiar destino" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">swap_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Travel Mode Pills -->
+<div class="pt-space-xs flex items-center gap-space-xs">
+<button class="flex-1 py-2 px-space-sm rounded-lg flex items-center justify-center gap-1.5 bg-primary text-on-primary transition-transform active:scale-95 shadow-sm" id="mode-walk">
+<span class="material-symbols-outlined text-[18px]">directions_walk</span>
+<span class="font-label-md text-label-md">Caminando</span>
+</button>
+<button class="flex-1 py-2 px-space-sm rounded-lg flex items-center justify-center gap-1.5 bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors" id="mode-bike">
+<span class="material-symbols-outlined text-[18px]">directions_bike</span>
+<span class="font-label-md text-label-md">Bici</span>
+</button>
+<button class="flex-1 py-2 px-space-sm rounded-lg flex items-center justify-center gap-1.5 bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors" id="mode-transit">
+<span class="material-symbols-outlined text-[18px]">directions_bus</span>
+<span class="font-label-md text-label-md">Transporte</span>
+</button>
+</div>
+</div>
+<!-- Interactive Map Visualization -->
+<div class="relative w-full h-56 rounded-xl overflow-hidden shadow-sm bg-surface-container-high">
+<div class="w-full h-full bg-cover bg-center" data-location="Parque Mexico, Ciudad de Mexico" style=""></div>
+<!-- Algorithm HUD Map Overlay Graphic (SVG Simulation of Dual Paths) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" viewbox="0 0 360 220">
+<!-- Dark gradient backdrop for HUD read -->
+<rect fill="url(#mapOverlayGrad)" height="220" opacity="0.45" width="360"></rect>
+<defs>
+<lineargradient id="mapOverlayGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0b1c30" stop-opacity="0.8"></stop>
+<stop offset="50%" stop-color="#0b1c30" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#0b1c30" stop-opacity="0.85"></stop>
+</lineargradient>
+</defs>
+<!-- Shorter Risky Route (Dashed Crimson) -->
+<path d="M 65 175 Q 120 140 180 110 T 295 50" opacity="0.85" stroke="#cf2c30" stroke-dasharray="6 6" stroke-width="4"></path>
+<!-- Hazard Node Warning Marker on Route 2 -->
+<circle cx="170" cy="115" fill="#ab0b1c" r="9"></circle>
+<text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="170" y="119">!</text>
+<!-- Optimal Safe Route (Glowing Primary Solid) -->
+<path d="M 65 175 C 90 190 140 170 190 150 C 230 130 250 85 295 50" stroke="#004ac6" stroke-linecap="round" stroke-width="6"></path>
+<path d="M 65 175 C 90 190 140 170 190 150 C 230 130 250 85 295 50" stroke="#b4c5ff" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Origin Node -->
+<circle cx="65" cy="175" fill="#004ac6" r="7"></circle>
+<circle cx="65" cy="175" fill="#ffffff" r="3"></circle>
+<!-- Destination Node -->
+<circle cx="295" cy="50" fill="#ab0b1c" r="7"></circle>
+<circle cx="295" cy="50" fill="#ffffff" r="3"></circle>
+<!-- Monitored Corridor Beacon / Safe Node -->
+<circle cx="190" cy="150" fill="#004ac6" fill-opacity="0.2" r="14"></circle>
+<circle cx="190" cy="150" fill="#2563eb" r="5"></circle>
+</svg>
+<!-- Map Floating Controls & Legend Badges -->
+<div class="absolute top-space-xs left-space-xs right-space-xs flex justify-between items-center pointer-events-auto">
+<div class="bg-inverse-surface/90 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-inverse-on-surface">Red C5 Activa · 41 Cámaras</span>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Centrar mapa" class="w-8 h-8 rounded-lg bg-surface-container-lowest/95 backdrop-blur shadow-sm flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">my_location</span>
+</button>
+<button aria-label="Capas de mapa" class="w-8 h-8 rounded-lg bg-surface-container-lowest/95 backdrop-blur shadow-sm flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">layers</span>
+</button>
+</div>
+</div>
+<!-- Active Route Indicator Pill at Bottom of Map -->
+<div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-inverse-on-surface bg-inverse-surface/85 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-fixed"></span>
+<span class="font-label-sm text-label-sm">Ruta Segura: +5 min por mayor custodia</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed font-bold">λ = 1.6</span>
+</div>
+</div>
+<!-- Route Comparison Section -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Opciones de Trayecto</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fórmula: Distancia + λ(Riesgo)</span>
+</div>
+<!-- Option 1: SIASE Recommended Safe Route (Selected) -->
+<div class="relative bg-surface-container-lowest p-space-md rounded-xl shadow-md border-2 border-transparent ring-2 ring-primary transition-all cursor-pointer" id="route-safe">
+<!-- Left Severity Ribbon Strip -->
+<div class="absolute top-0 bottom-0 left-0 w-1.5 bg-[#10b981] rounded-l-xl"></div>
+<div class="pl-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="bg-[#10b981]/15 text-[#047857] px-2 py-0.5 rounded-full font-label-sm text-label-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              ⭐ Ruta Segura SIASE
+            </span>
+</div>
+<span class="bg-[#10b981]/15 text-[#047857] font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Riesgo: 14/100</span>
+</div>
+<div class="mt-space-sm flex items-baseline justify-between">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface font-extrabold">22</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">min</span>
+<span class="mx-1 text-outline-variant">•</span>
+<span class="font-title-md text-title-md text-on-surface">1.8 km</span>
+</div>
+<span class="font-label-sm text-label-sm text-[#047857] font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[16px]">shield</span> Muy Seguro
+          </span>
+</div>
+<!-- Metric Details Pill Matrix -->
+<div class="mt-space-sm pt-space-xs grid grid-cols-3 gap-space-xs">
+<div class="bg-surface-container-low p-2 rounded-lg text-center">
+<span class="material-symbols-outlined text-[18px] text-primary block mx-auto">lightbulb</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-0.5 block">100%</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant block">Alumbrado</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-center">
+<span class="material-symbols-outlined text-[18px] text-primary block mx-auto">videocam</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-0.5 block">92%</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant block">Cámaras C5</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-center">
+<span class="material-symbols-outlined text-[18px] text-[#047857] block mx-auto">security</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold mt-0.5 block">0 Incidencias</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant block">Últimas 48h</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Option 2: Shortest Route with Risk Warning -->
+<div class="relative bg-surface-container-lowest p-space-md rounded-xl shadow-sm transition-all cursor-pointer opacity-90 hover:opacity-100" id="route-fast">
+<!-- Left Warning Ribbon Strip -->
+<div class="absolute top-0 bottom-0 left-0 w-1.5 bg-tertiary-container rounded-l-xl"></div>
+<div class="pl-2">
+<div class="flex items-center justify-between">
+<span class="bg-surface-container text-on-secondary-container px-2 py-0.5 rounded-full font-label-sm text-label-sm">
+            Ruta Más Rápida
+          </span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Riesgo: 68/100</span>
+</div>
+<div class="mt-space-sm flex items-baseline justify-between">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface font-extrabold">17</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">min</span>
+<span class="mx-1 text-outline-variant">•</span>
+<span class="font-title-md text-title-md text-on-surface">1.4 km</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[16px]">warning</span> Riesgo Alto
+          </span>
+</div>
+<!-- Warning Card Banner -->
+<div class="mt-space-sm bg-tertiary-fixed/40 p-2.5 rounded-lg flex items-start gap-space-xs text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[18px] text-tertiary shrink-0 mt-0.5">report_problem</span>
+<p class="font-body-sm text-body-sm text-on-tertiary-fixed-variant leading-tight">
+            Atraviesa tramo con <span class="font-bold">3 reportes de robo</span> y fallas de luminarias en las últimas 24h (Calle Jalapa).
+          </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Modo Acompáñame (Live Safe Walk Experience) -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-sm space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">group</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface leading-tight">Modo Acompáñame</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tele-custodia cívica en vivo</span>
+</div>
+</div>
+<!-- Interactive Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="toggle-acompname" type="checkbox"/>
+<div class="w-12 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Linked Guardian Contacts -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-surface" data-alt="Close up realistic portrait photo of a warm smiling middle-aged Hispanic mother wearing a casual blue cardigan with soft background lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn1r-C21Z5MwHFqJlBf5yNom1jqUDnPNW4DPF8k5czngjqxEGrJSLiBOXrQtDvH4g1t7EDhQ3Ej5w8RgudxGiKNkpYZoAgwu1ZRnSVRSSnNYPm4mq6OWjw_J-h4TKQ5gVyO2HVU1qFRawgD5PyU4fE8Pz_KmiyxpPqJ0FlH2GxVdmRd6BNPcVTq5X1A9CRVEn0hnlGA75paApbscJryMySfjINxBqduuexF3qn8w"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-surface" data-alt="Portrait photo of a young adult Hispanic man wearing dark glasses and navy collared polo looking friendly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6MbRSxB9yHfXnTcQfiHVH5wXKXA3sdY8P3_-BaaFegcF0zZY2f3FVj-KvI40OaL6ny7i9wNMlAtNKzT7l02dpsMRZngEki1gVAiYpCwUCs9rwOQl8rPknzq2lvyUB8qgn4Rx7-TO0_p9ouEEULXCX5RcOknMQhjgonODi60n1Si9NFirigaEbIZvlOdI2jMt3Ft7cS6xBWHtM-eIIkJAkAmlgkjJbpkU3_2yPvw"/>
+</div>
+<div class="truncate">
+<span class="font-label-md text-label-md text-on-surface block truncate">Mamá &amp; Carlos</span>
+<span class="font-label-sm text-label-sm text-[#047857] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span> Vinculados (SMS/Push)
+          </span>
+</div>
+</div>
+<button aria-label="Gestionar custodios" class="text-primary hover:bg-surface-container px-2 py-1 rounded font-label-sm text-label-sm">
+        Editar
+      </button>
+</div>
+<!-- Active Inactivity Sensor Feedback -->
+<div class="flex items-center gap-space-xs text-on-surface-variant px-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">motion_sensor_active</span>
+<p class="font-body-sm text-body-sm">
+        Disparador: <span class="font-semibold text-on-surface">Alerta automática si te detienes más de 3 minutos.</span>
+</p>
+</div>
+</div>
+<!-- Primary Departure / Life-Safety Actions (Thumb Zone) -->
+<div class="pt-space-xs pb-space-sm flex items-center gap-space-sm">
+<!-- Big Primary Safe Trip Button -->
+<button class="flex-1 h-14 bg-primary text-on-primary rounded-xl font-label-lg text-label-lg flex items-center justify-center gap-space-xs shadow-md active:scale-[0.98] transition-all" id="btn-start-route">
+<span class="material-symbols-outlined text-[24px]">navigation</span>
+<span>Iniciar Ruta Protegida</span>
+</button>
+<!-- Tactical Panic Trigger Dial -->
+<button aria-label="Botón de emergencia inmediata" class="w-14 h-14 bg-tertiary text-on-tertiary rounded-xl flex items-center justify-center shrink-0 shadow-md active:scale-95 transition-transform relative" id="btn-quick-sos">
+<span class="absolute inset-0 rounded-xl bg-tertiary animate-ping opacity-25"></span>
+<span class="material-symbols-outlined text-[26px]">sos</span>
+</button>
+</div>
+</div>
+<script>
+  // Simple interactive selection logic for Route Cards
+  const safeRouteCard = document.getElementById('route-safe');
+  const fastRouteCard = document.getElementById('route-fast');
+  const startBtn = document.getElementById('btn-start-route');
+
+  safeRouteCard.addEventListener('click', () => {
+    safeRouteCard.classList.add('ring-2', 'ring-primary');
+    fastRouteCard.classList.remove('ring-2', 'ring-primary');
+    startBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">navigation</span><span>Iniciar Ruta Protegida</span>';
+  });
+
+  fastRouteCard.addEventListener('click', () => {
+    fastRouteCard.classList.add('ring-2', 'ring-primary');
+    safeRouteCard.classList.remove('ring-2', 'ring-primary');
+    startBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">navigation</span><span>Continuar con Ruta Rápida</span>';
+  });
+
+  // Mode Selection Toggle
+  const modes = ['mode-walk', 'mode-bike', 'mode-transit'];
+  modes.forEach(modeId => {
+    const el = document.getElementById(modeId);
+    el.addEventListener('click', () => {
+      modes.forEach(id => {
+        const otherEl = document.getElementById(id);
+        otherEl.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+        otherEl.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      el.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+      el.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(15,23,42,0.06)]" data-active-classes="text-primary font-bold"><div class="flex items-center justify-between h-20 px-gutter-mobile relative"><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] w-1/4 py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="inicio" href="#"><span class="material-symbols-outlined text-[24px]">fmd_good</span><span class="font-label-md text-label-md mt-space-xs">Inicio</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] w-1/4 py-space-xs transition-colors text-primary font-bold" data-path="ruta-segura" href="#"><span class="material-symbols-outlined text-[24px]">alt_route</span><span class="font-label-md text-label-md mt-space-xs">Ruta Segura</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] w-1/4 py-space-xs -mt-5 group" data-path="reportar" href="#"><div class="w-14 h-14 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-lg transition-transform active:scale-95"><span class="material-symbols-outlined text-[28px]">campaign</span></div><span class="font-label-md text-label-md text-tertiary mt-1">Reportar</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] w-1/4 py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="mi-perfil" href="#"><span class="material-symbols-outlined text-[24px]">shield_person</span><span class="font-label-md text-label-md mt-space-xs">Mi Perfil</span></a></div></nav></body></html>

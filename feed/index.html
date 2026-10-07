@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Inicio</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../app.css">
+    <style>
+        #locationPickerMap {
+            height: 340px;
+            width: 100%;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body>
+        <nav class="bottom-menu"></nav>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER (FeedHeader) -->
+        <div class="feed-header">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-grid-fill text-teal fs-4 me-2"></i>
+                <div>
+                    <span class="app-brand">HeroesMX</span>
+                    <h4 class="mb-0 fw-bold">Inicio</h4>
+                </div>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="mx-1">•</span>
+                <span id="headerStreak">0</span>
+                <span class="ms-1">🔥</span>
+            </div>
+        </div>
+
+        <!-- Sube un poco el contenido por el padding del body -->
+        <div class="pt-2"></div>
+
+        <!-- SEARCH AND ACTION CARDS (FeedActionCards) -->
+        <div class="px-4 mb-4">
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="action-card bg-light-grey d-flex justify-content-between" for="reportSearch">
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="bi bi-search me-2"></i>
+                            <input class="form-control border-0 bg-transparent p-0" id="reportSearch" type="search" placeholder="Buscar reportes o noticias..." aria-label="Buscar reportes">
+                        </div>
+                    </label>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="action-card justify-content-center border-teal text-teal w-100" style="border-color: var(--primary-teal);" data-bs-toggle="modal" data-bs-target="#reportModal">
+                        <i class="bi bi-plus-circle-fill me-2"></i>
+                        <span class="fw-bold" style="font-size: 14px;">Reportar</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <a class="action-card justify-content-center text-decoration-none" href="../seguridad/index.html#tripTitle">
+                        <i class="bi bi-map-fill text-secondary me-2"></i>
+                        <span class="fw-bold text-dark" style="font-size: 14px;">Mapa</span>
+                    </a>
+                </div>
+                <div class="col-12">
+                    <a class="action-card justify-content-center border-teal text-teal text-decoration-none" href="../seguridad/index.html">
+                        <i class="bi bi-shield-check me-2"></i>
+                        <span class="fw-bold" style="font-size: 14px;">Centro de Seguridad</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community feed -->
+        <div class="px-4 mb-3 d-flex align-items-center justify-content-between gap-2">
+            <div>
+                <h5 class="fw-bold mb-0" style="font-size: 18px;">Comunidad y noticias</h5>
+                <span class="small text-muted" id="newsStatus" aria-live="polite">Cargando noticias…</span>
+                <span class="small text-muted d-block">Publicaciones y noticias se muestran intercaladas · titulares de México cada 5 minutos.</span>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshNewsButton" aria-label="Actualizar noticias" title="Actualizar noticias">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+        
+        <div id="communityFeed" aria-live="polite"></div>
+
+    </div>
+
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="reportForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="reportModalTitle">Nueva publicación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="reportCategory" class="form-label">Tipo de incidente</label>
+                            <select class="form-select" id="reportCategory" required>
+                                <option value="General">Otro</option>
+                                <option value="Robo / asalto">Robo / asalto</option>
+                                <option value="Accidente vial">Accidente vial</option>
+                                <option value="Persona sospechosa">Persona sospechosa</option>
+                                <option value="Violencia / riña">Violencia / riña</option>
+                                <option value="Alumbrado">Alumbrado</option>
+                                <option value="Vandalismo">Vandalismo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportTitle" class="form-label">Título</label>
+                            <input class="form-control" id="reportTitle" maxlength="120" required>
+                        </div>
+                        <div>
+                            <label for="reportDescription" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="reportDescription" rows="4" maxlength="2000" required></textarea>
+                        </div>
+                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mt-3">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="reportLocationButton"><i class="bi bi-geo-alt me-1"></i>Usar mi ubicación</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="reportMapLocationButton"><i class="bi bi-map me-1"></i>Elegir en mapa</button>
+                            </div>
+                            <span class="small text-muted text-end" id="reportLocationStatus">Ubicación no compartida</span>
+                        </div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="anonymousReport">
+                            <label class="form-check-label" for="anonymousReport">Publicar como anónimo</label>
+                        </div>
+                        <p class="small text-muted mt-3 mb-0">Se guardará en el equipo que aloja la aplicación. No se envía a C5 ni al 911.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success" id="publishButton">Publicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="locationPickerModal" tabindex="-1" aria-labelledby="locationPickerTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="locationPickerTitle">Selecciona la ubicación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">Toca el mapa para marcar el punto exacto del incidente o altercado.</p>
+                    <div id="locationPickerMap" aria-label="Mapa para seleccionar ubicación"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="confirmLocationButton">Usar esta ubicación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SnackBar (Toast) para interacciones -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="actionSnackBar" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="snackBarMessage">Mensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+
+    <script>
+        let reportLocation = null;
+        let mapPicker = null;
+        let locationMarker = null;
+        let pendingMapLocation = null;
+
+        function updateLocationStatus(label = 'Ubicación no compartida', location = null) {
+            const statusElement = document.getElementById('reportLocationStatus');
+            if (!statusElement) return;
+
+            if (location) {
+                statusElement.textContent = `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
+                statusElement.title = 'Ubicación seleccionada';
+                return;
+            }
+
+            statusElement.textContent = label;
+            statusElement.title = '';
+        }
+
+        function initLocationPicker() {
+            if (mapPicker) {
+                setTimeout(() => mapPicker.invalidateSize(), 100);
+                return;
+            }
+
+            const initialPoint = reportLocation
+                ? [reportLocation.latitude, reportLocation.longitude]
+                : [19.4326, -99.1332];
+
+            mapPicker = L.map('locationPickerMap', {
+                zoomControl: true,
+                scrollWheelZoom: true
+            }).setView(initialPoint, 11);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapPicker);
+
+            locationMarker = L.marker(initialPoint).addTo(mapPicker);
+            mapPicker.on('click', event => {
+                const point = mapPicker.wrapLatLng(event.latlng);
+                const selected = {
+                    latitude: point.lat,
+                    longitude: point.lng
+                };
+                if (!Number.isFinite(selected.latitude) || !Number.isFinite(selected.longitude)
+                    || selected.latitude < -90 || selected.latitude > 90
+                    || selected.longitude < -180 || selected.longitude > 180) {
+                    showToast('No se pudo validar ese punto. Selecciona otra ubicación en el mapa.');
+                    return;
+                }
+                pendingMapLocation = selected;
+                locationMarker.setLatLng([selected.latitude, selected.longitude]);
+            });
+        }
+
+        function openLocationPicker() {
+            if (!window.L) {
+                showToast('No se pudo cargar el mapa para elegir una ubicación.');
+                return;
+            }
+
+            initLocationPicker();
+
+            const target = reportLocation ?? pendingMapLocation;
+            if (target && mapPicker && locationMarker) {
+                const nextPoint = [target.latitude, target.longitude];
+                locationMarker.setLatLng(nextPoint);
+                mapPicker.setView(nextPoint, 12);
+            }
+
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('locationPickerModal'));
+            modal.show();
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.CivicApp.loadDashboard();
+            } catch (error) {
+                window.showToast(error.message);
+            }
+
+            loadNews();
+            document.getElementById('refreshNewsButton').addEventListener('click', loadNews);
+            window.setInterval(loadNews, 300000);
+            loadReports();
+            document.getElementById('reportSearch').addEventListener('input', filterFeed);
+
+            document.getElementById('reportLocationButton').addEventListener('click', () => {
+                const status = document.getElementById('reportLocationStatus');
+                if (!navigator.geolocation) {
+                    updateLocationStatus('Ubicación no disponible');
+                    return;
+                }
+                status.textContent = 'Solicitando permiso…';
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        reportLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        pendingMapLocation = null;
+                        updateLocationStatus('Ubicación actual', reportLocation);
+                    },
+                    () => {
+                        reportLocation = null;
+                        pendingMapLocation = null;
+                        updateLocationStatus('No se obtuvo ubicación');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            });
+
+            document.getElementById('reportMapLocationButton').addEventListener('click', openLocationPicker);
+
+            document.getElementById('confirmLocationButton').addEventListener('click', () => {
+                if (!pendingMapLocation) {
+                    showToast('Toca el mapa para elegir un punto antes de guardar.');
+                    return;
+                }
+
+                reportLocation = {
+                    latitude: pendingMapLocation.latitude,
+                    longitude: pendingMapLocation.longitude
+                };
+                updateLocationStatus('Ubicación seleccionada', reportLocation);
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('locationPickerModal')).hide();
+            });
+
+            document.getElementById('reportForm').addEventListener('submit', async event => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const publishButton = document.getElementById('publishButton');
+                publishButton.disabled = true;
+                try {
+                    if (reportLocation && (
+                        !Number.isFinite(reportLocation.latitude)
+                        || !Number.isFinite(reportLocation.longitude)
+                        || reportLocation.latitude < -90
+                        || reportLocation.latitude > 90
+                        || reportLocation.longitude < -180
+                        || reportLocation.longitude > 180
+                    )) {
+                        throw new Error('La ubicación seleccionada no es válida. Vuelve a elegir el punto en el mapa.');
+                    }
+
+                    await window.CivicApi.createPost(
+                        document.getElementById('reportTitle').value.trim(),
+                        document.getElementById('reportDescription').value.trim(),
+                        {
+                            category: document.getElementById('reportCategory').value,
+                            latitude: reportLocation?.latitude ?? null,
+                            longitude: reportLocation?.longitude ?? null,
+                            anonymous: document.getElementById('anonymousReport').checked
+                        }
+                    );
+                    form.reset();
+                    reportLocation = null;
+                    pendingMapLocation = null;
+                    updateLocationStatus();
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('reportModal')).hide();
+                    showToast('Publicación guardada en el equipo anfitrión.');
+                    await loadReports();
+                } catch (error) {
+                    showToast(error.message);
+                } finally {
+                    publishButton.disabled = false;
+                }
+            });
+        });
+
+        let newsLoading = false;
+        let feedNews = [];
+        let feedReports = [];
+
+        async function loadNews() {
+            if (newsLoading) return;
+
+            const newsStatus = document.getElementById('newsStatus');
+            const refreshButton = document.getElementById('refreshNewsButton');
+            newsLoading = true;
+            refreshButton.disabled = true;
+            newsStatus.textContent = 'Buscando noticias recientes…';
+
+            try {
+                const response = await fetch('/api/news', { cache: 'no-store' });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'No se pudieron cargar las noticias.');
+                }
+                if (!Array.isArray(result.articles)) {
+                    throw new Error('El servidor devolvió un formato de noticias inesperado.');
+                }
+
+                feedNews = result.articles;
+                renderCommunityFeed();
+
+                const updatedAt = new Date(result.updated_at);
+                newsStatus.textContent = Number.isNaN(updatedAt.getTime())
+                    ? 'Noticias actualizadas'
+                    : `Actualizado ${updatedAt.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
+            } catch (error) {
+                newsStatus.textContent = error.message || 'No se pudieron cargar las noticias.';
+                renderCommunityFeed();
+            } finally {
+                newsLoading = false;
+                refreshButton.disabled = false;
+            }
+        }
+
+        function createNewsCard(article) {
+            const card = document.createElement('article');
+            card.className = 'news-card feed-item';
+
+            const meta = document.createElement('div');
+            meta.className = 'd-flex justify-content-between align-items-start gap-2 mb-2';
+            const badge = document.createElement('span');
+            badge.className = 'news-badge';
+            badge.textContent = 'México · Noticia pública';
+            const date = document.createElement('small');
+            date.className = 'news-meta text-end';
+            date.textContent = formatNewsDate(article.published_at);
+            meta.append(badge, date);
+
+            const link = document.createElement('a');
+            link.className = 'news-link';
+            link.textContent = article.title;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            try {
+                const url = new URL(article.url);
+                if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+                    throw new Error('Protocolo de noticia no válido.');
+                }
+                link.href = url.href;
+            } catch {
+                link.removeAttribute('href');
+                link.removeAttribute('target');
+                link.removeAttribute('rel');
+            }
+
+            const source = document.createElement('small');
+            source.className = 'news-source d-block mt-2';
+            source.textContent = article.source ? `Fuente: ${article.source}` : 'Abrir noticia';
+            card.append(meta, link, source);
+            return card;
+        }
+
+        function formatNewsDate(value) {
+            const publishedAt = new Date(value);
+            if (Number.isNaN(publishedAt.getTime())) return 'Fecha no disponible';
+
+            const secondsAgo = Math.round((publishedAt.getTime() - Date.now()) / 1000);
+            const units = [
+                ['day', 86400],
+                ['hour', 3600],
+                ['minute', 60],
+                ['second', 1]
+            ];
+            const [unit, duration] = units.find(([, size]) => Math.abs(secondsAgo) >= size) || units[3];
+            const relative = Math.round(secondsAgo / duration);
+            return new Intl.RelativeTimeFormat('es-MX', { numeric: 'auto' }).format(relative, unit);
+        }
+
+        function renderCommunityFeed() {
+            const container = document.getElementById('communityFeed');
+            const fragment = document.createDocumentFragment();
+            let reportIndex = 0;
+            let newsIndex = 0;
+
+            while (reportIndex < feedReports.length || newsIndex < feedNews.length) {
+                if (reportIndex < feedReports.length) {
+                    fragment.append(createReportCard(feedReports[reportIndex]));
+                    reportIndex += 1;
+                }
+                if (newsIndex < feedNews.length) {
+                    fragment.append(createNewsCard(feedNews[newsIndex]));
+                    newsIndex += 1;
+                }
+            }
+
+            if (reportIndex === 0 && newsIndex === 0) {
+                const emptyState = document.createElement('p');
+                emptyState.className = 'px-4 text-muted small';
+                emptyState.textContent = 'Todavía no hay publicaciones ni noticias disponibles.';
+                fragment.append(emptyState);
+            }
+
+            container.replaceChildren(fragment);
+            filterFeed();
+        }
+
+        async function loadReports() {
+            try {
+                feedReports = await window.CivicApi.listPosts();
+                renderCommunityFeed();
+            } catch (error) {
+                showToast(error.message || 'No se pudieron cargar las publicaciones.');
+            }
+        }
+
+        function filterFeed() {
+            const query = document.getElementById('reportSearch').value.trim().toLocaleLowerCase('es-MX');
+            document.querySelectorAll('#communityFeed .feed-item').forEach(card => {
+                card.hidden = !card.textContent.toLocaleLowerCase('es-MX').includes(query);
+            });
+        }
+
+        function createReportCard(report) {
+            const card = document.createElement('article');
+            card.className = 'report-card feed-item';
+
+            const header = document.createElement('div');
+            header.className = 'd-flex justify-content-between align-items-center mb-3';
+            const authorGroup = document.createElement('div');
+            authorGroup.className = 'd-flex align-items-center';
+            const avatar = document.createElement('div');
+            avatar.className = 'report-avatar';
+            avatar.innerHTML = '<i class="bi bi-person-fill fs-5"></i>';
+            const authorDetails = document.createElement('div');
+            authorDetails.className = 'ms-2';
+            const author = document.createElement('div');
+            author.className = 'fw-bold';
+            author.style.fontSize = '13px';
+            author.textContent = report.author;
+            const time = document.createElement('div');
+            time.className = 'text-muted';
+            time.style.fontSize = '11px';
+            time.textContent = new Date(report.created_at).toLocaleString('es-MX');
+            authorDetails.append(author, time);
+            authorGroup.append(avatar, authorDetails);
+
+            const status = document.createElement('div');
+            status.className = `report-status ${report.is_demo ? 'status-demo' : report.status === 'Atendido' ? 'status-resolved' : 'status-pending'}`;
+            status.textContent = report.is_demo ? 'DEMO' : report.status;
+            const category = document.createElement('span');
+            category.className = 'small text-secondary text-center';
+            category.textContent = report.category || 'General';
+            header.append(authorGroup, category, status);
+
+            const title = document.createElement('h6');
+            title.className = 'fw-bold mb-1';
+            title.style.fontSize = '15px';
+            title.textContent = report.title;
+            const description = document.createElement('p');
+            description.className = 'text-muted mb-0';
+            description.style.fontSize = '13px';
+            description.textContent = report.description;
+
+            card.append(header, title, description);
+            return card;
+        }
+
+        // Utilidad global para los Toast (SnackBar)
+        const toastEl = document.getElementById('actionSnackBar');
+        const snackBarMessage = document.getElementById('snackBarMessage');
+        let snackBarInstance;
+
+        window.showToast = function(message) {
+            snackBarMessage.textContent = message;
+            if (!snackBarInstance) {
+                snackBarInstance = new bootstrap.Toast(toastEl, { delay: 2000 });
+            }
+            snackBarInstance.show();
+        };
+    </script>
+</body>
+</html>

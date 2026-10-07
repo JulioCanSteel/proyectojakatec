@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Perfil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --primary-dark-teal: #004d4d;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+       body {
+            padding-bottom: 80px;
+            }
+
+            .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            z-index: 1000;
+            }
+
+            .bottom-menu a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #6c757d;
+            font-size: 11px;
+            text-decoration: none;
+            }
+
+            .bottom-menu i {
+            font-size: 20px;
+            }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Utilidades de color y fondo */
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        .bg-light-grey { background-color: var(--light-grey); }
+        
+        /* Tarjeta Principal (Gradiente) */
+        .profile-gradient-card {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+        }
+
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50px;
+            border: 4px solid var(--accent-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .level-badge {
+            background-color: var(--accent-amber);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: black;
+            display: inline-block;
+        }
+
+        /* Logros (Medallas) */
+        .medal-box {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 193, 7, 0.1);
+            border-radius: 12px;
+            border: 2px solid var(--accent-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 8px auto;
+        }
+
+        /* Tarjetas de Opciones y Estadísticas */
+        .option-card, .stats-card {
+            background-color: var(--light-grey);
+            border-radius: 12px;
+            border: 1px solid var(--medium-grey);
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .option-card:hover {
+            background-color: var(--medium-grey);
+        }
+
+        .stats-card {
+            padding: 20px;
+            cursor: default;
+            border-radius: 16px;
+        }
+
+        /* Barras de progreso */
+        .progress {
+            height: 8px;
+            background-color: var(--medium-grey);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-teal);
+        }
+
+        /* Botones */
+        .btn-teal {
+            background-color: var(--primary-teal);
+            color: white;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 500;
+        }
+        
+        .btn-teal:hover { background-color: var(--primary-dark-teal); color: white; }
+
+        .btn-outline-danger {
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 500;
+        }
+    </style>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-fill text-teal fs-3 me-2"></i>
+                <div>
+                    <span class="app-brand">HeroesMX</span>
+                    <h4 class="mb-0 fw-bold">Perfil</h4>
+                </div>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="mx-1">•</span>
+                <span id="headerStreak">0</span>
+                <span class="ms-1">🔥</span>
+            </div>
+        </header>
+
+        <!-- TARJETA PRINCIPAL DE PERFIL -->
+        <div class="px-4 mb-4">
+            <div class="profile-gradient-card text-center">
+                <div class="avatar-container mb-3">
+                    <i class="bi bi-person-fill text-teal" style="font-size: 60px; line-height: 1;"></i>
+                </div>
+                <h2 class="fw-bold mb-2" id="userName">Cargando...</h2>
+                <div class="level-badge font-space fw-bold mb-4" id="userLevel">Nivel 0</div>
+                
+                <!-- Stats Row -->
+                <div class="d-flex justify-content-evenly">
+                    <div class="text-center">
+                        <div class="fs-5 fw-bold" id="statAportes">0</div>
+                        <div class="small text-white-50">Aportes</div>
+                    </div>
+                    <div class="border-end border-white-50"></div>
+                    <div class="text-center">
+                        <div class="fs-5 fw-bold" id="statRacha">0</div>
+                        <div class="small text-white-50">Racha</div>
+                    </div>
+                    <div class="border-end border-white-50"></div>
+                    <div class="text-center">
+                        <div class="fs-5 fw-bold" id="statLogros">0</div>
+                        <div class="small text-white-50">Logros</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGROS DESTACADOS -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Logros Destacados</h5>
+            <div class="row text-center g-2" id="achievementsContainer">
+                <p class="small text-muted">Cargando logros…</p>
+            </div>
+        </div>
+
+        <!-- OPCIONES -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Herramientas</h5>
+            
+            <a class="option-card d-flex align-items-center mb-2 text-decoration-none text-dark" href="../seguridad/index.html#alertTitle">
+                <i class="bi bi-bell-fill text-teal fs-4"></i>
+                <div class="ms-3 flex-grow-1">
+                    <div class="fw-bold" style="font-size: 14px;">Centro de Seguridad</div>
+                    <div class="text-muted" style="font-size: 12px;">Alertas locales y acompañamiento</div>
+                </div>
+                <i class="bi bi-chevron-right text-secondary" style="font-size: 12px;"></i>
+            </a>
+
+            <a class="option-card d-flex align-items-center mb-2 text-decoration-none text-dark" href="../seguridad/index.html#businessTitle">
+                <i class="bi bi-shield-lock-fill text-teal fs-4"></i>
+                <div class="ms-3 flex-grow-1">
+                    <div class="fw-bold" style="font-size: 14px;">Mi comercio</div>
+                    <div class="text-muted" style="font-size: 12px;">Edita el nombre del negocio</div>
+                </div>
+                <i class="bi bi-chevron-right text-secondary" style="font-size: 12px;"></i>
+            </a>
+
+            <a class="option-card d-flex align-items-center mb-2 text-decoration-none text-dark" href="../gov/gov.html#faqAccordion">
+                <i class="bi bi-question-circle-fill text-teal fs-4"></i>
+                <div class="ms-3 flex-grow-1">
+                    <div class="fw-bold" style="font-size: 14px;">Ayuda y Soporte</div>
+                    <div class="text-muted" style="font-size: 12px;">Guías y preguntas frecuentes</div>
+                </div>
+                <i class="bi bi-chevron-right text-secondary" style="font-size: 12px;"></i>
+            </a>
+
+            <div class="option-card d-flex align-items-center mb-2">
+                <i class="bi bi-info-circle-fill text-teal fs-4"></i>
+                <div class="ms-3 flex-grow-1">
+                    <div class="fw-bold" style="font-size: 14px;">Acerca de HeroesMX</div>
+                    <div class="text-muted" style="font-size: 12px;">Versión 1.0.0</div>
+                </div>
+                <i class="bi bi-chevron-right text-secondary" style="font-size: 12px;"></i>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS GENERALES -->
+        <div class="px-4 mb-4">
+            <div class="stats-card">
+                <h5 class="fw-bold mb-3">Estadísticas</h5>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size: 12px;">
+                        <span>Aportes Totales</span>
+                        <span id="barAportesValue">0</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="barAportes" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size: 12px;">
+                        <span>Logros Desbloqueados</span>
+                        <span id="barLogrosValue">0</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="barLogros" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between mb-1" style="font-size: 12px;">
+                        <span>Nivel Actual</span>
+                        <span id="barLevelValue">0</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="barLevel" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="px-4 d-grid gap-2">
+            <a class="btn btn-teal" href="../seguridad/index.html#businessTitle">Editar negocio</a>
+            <button class="btn btn-outline-danger" onclick="handleLogout()">Cerrar Sesión</button>
+        </div>
+
+    </div>
+
+    <nav class="bottom-menu"></nav>
+
+    <!-- SnackBar (Toast de Bootstrap) -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="actionSnackBar" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="snackBarMessage">Mensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const currentUser = await window.CivicAuth.getCurrentUser();
+                if (!currentUser) {
+                    window.location.replace('../login/loguin.html');
+                    return;
+                }
+                const dashboard = await window.CivicApp.loadDashboard();
+                loadUserProfile(currentUser, dashboard);
+            } catch {
+                window.location.replace('../login/loguin.html');
+            }
+        });
+
+        function loadUserProfile(currentUser, dashboard) {
+            const { stats, streak } = dashboard;
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userLevel').textContent = `Nivel ${stats.level}`;
+            document.getElementById('statAportes').textContent = stats.contributions;
+            document.getElementById('statRacha').textContent = streak.days;
+            document.getElementById('statLogros').textContent = dashboard.achievements.length;
+            document.getElementById('barAportesValue').textContent = stats.contributions;
+            document.getElementById('barAportes').style.width = `${Math.min(100, stats.contributions * 10)}%`;
+            document.getElementById('barLogrosValue').textContent = dashboard.achievements.length;
+            document.getElementById('barLogros').style.width = `${Math.min(100, dashboard.achievements.length / 3 * 100)}%`;
+            document.getElementById('barLevelValue').textContent = stats.level;
+            document.getElementById('barLevel').style.width = `${Math.min(100, stats.level * 10)}%`;
+
+            const achievementsContainer = document.getElementById('achievementsContainer');
+            if (!dashboard.achievements.length) {
+                const empty = document.createElement('p');
+                empty.className = 'small text-muted';
+                empty.textContent = 'Completa actividades para desbloquear logros.';
+                achievementsContainer.replaceChildren(empty);
+                return;
+            }
+            achievementsContainer.replaceChildren(...dashboard.achievements.map(achievement => {
+                const column = document.createElement('div');
+                column.className = 'col-4';
+                const medal = document.createElement('div');
+                medal.className = 'medal-box';
+                const icon = document.createElement('i');
+                icon.className = `bi ${achievement.icon}`;
+                medal.append(icon);
+                const label = document.createElement('div');
+                label.className = 'small fw-medium';
+                label.textContent = achievement.label;
+                column.append(medal, label);
+                return column;
+            }));
+        }
+
+        // Equivalente a ScaffoldMessenger.of(context).showSnackBar()
+        function showToast(message) {
+            const toastEl = document.getElementById('actionSnackBar');
+            const snackBarMessage = document.getElementById('snackBarMessage');
+            snackBarMessage.textContent = message;
+            
+            const snackBar = new bootstrap.Toast(toastEl, { delay: 3000 });
+            snackBar.show();
+        }
+
+        // Equivalente a authService.logout() y Navigator.pushReplacement()
+        async function handleLogout() {
+            showToast('Cerrando sesión...');
+            try {
+                await window.CivicAuth.logout();
+            } finally {
+                window.location.href = '../login/loguin.html';
+            }
+        }
+    </script>
+</body>
+</html>

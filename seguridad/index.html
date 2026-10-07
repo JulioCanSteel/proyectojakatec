@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Centro de Seguridad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        :root {
+            --ink: #142438;
+            --muted: #596a7b;
+            --line: #d9e1e8;
+            --canvas: #f5f7fa;
+            --blue: #1557a6;
+            --red: #b42332;
+            --green: #137456;
+            --amber: #9a5b00;
+        }
+
+        body { background: var(--canvas); color: var(--ink); font-family: 'Poppins', sans-serif; padding-bottom: 82px; }
+        .security-shell { max-width: 760px; margin: 0 auto; min-height: 100vh; background: #fff; }
+        .page-header { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); }
+        .page-header h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        .page-header h1 { font-size: 20px; }
+        .eyebrow { color: var(--blue); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .section { padding: 20px; border-bottom: 1px solid var(--line); }
+        .section-heading { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .section-copy { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+        .panel { border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); display: inline-block; }
+        .btn { min-height: 44px; border-radius: 8px; font-weight: 600; }
+        .btn-primary { --bs-btn-bg: var(--blue); --bs-btn-border-color: var(--blue); --bs-btn-hover-bg: #104987; --bs-btn-hover-border-color: #104987; }
+        .btn-danger { --bs-btn-bg: var(--red); --bs-btn-border-color: var(--red); --bs-btn-hover-bg: #951d2b; --bs-btn-hover-border-color: #951d2b; }
+        .btn-outline-secondary { --bs-btn-color: var(--ink); --bs-btn-border-color: #aab7c3; --bs-btn-hover-bg: #edf1f4; --bs-btn-hover-color: var(--ink); }
+        .notice { border-left: 3px solid #d19418; background: #fff8e7; color: #563900; padding: 12px; font-size: 12px; }
+        .sos-panel { border-color: #e5b6bb; background: #fff8f8; }
+        .countdown { color: var(--red); font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; }
+        .bottom-menu { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 760px; display: flex; justify-content: space-around; padding: 9px 4px; background: #fff; border-top: 1px solid var(--line); z-index: 10; }
+        .bottom-menu a { min-width: 52px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; font-size: 10px; }
+        .bottom-menu i { font-size: 19px; }
+        .bottom-menu .active { color: var(--blue); font-weight: 700; }
+        .meter { height: 8px; background: #e7edf2; border-radius: 4px; overflow: hidden; }
+        .meter > span { display: block; height: 100%; width: 0; background: var(--amber); transition: width .2s linear; }
+        .heat-map { height: 320px; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #edf2f5; z-index: 0; }
+        .heat-map .leaflet-container { font-family: 'Poppins', sans-serif; }
+        .map-key { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+        .map-key-low { background: #15966a; }
+        .map-key-medium { background: #d39119; }
+        .map-key-high { background: #c52f3e; }
+        .heat-index { font-family: 'Space Grotesk', sans-serif; font-variant-numeric: tabular-nums; }
+        .guide { border-top: 1px solid var(--line); }
+        .guide summary { cursor: pointer; font-weight: 600; padding: 14px 0; }
+        .guide p { color: var(--muted); font-size: 13px; }
+        #recordingAudio { width: 100%; }
+        @media (min-width: 600px) {
+            .section { padding: 24px 28px; }
+        }
+    </style>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+    <main class="security-shell">
+        <header class="page-header px-3 py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <div class="eyebrow">HeroesMX · Herramientas personales</div>
+                <h1 class="mb-0">Centro de Seguridad</h1>
+            </div>
+            <a class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2" href="../perfil/perfil.html" aria-label="Abrir perfil"><i class="bi bi-person"></i><span id="userName">Perfil</span></a>
+        </header>
+
+        <section class="section" aria-labelledby="radarTitle">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                    <div class="eyebrow">Radar comunitario</div>
+                    <h2 class="section-heading" id="radarTitle">Incidentes cercanos</h2>
+                </div>
+                <span class="small text-success d-flex align-items-center gap-2"><span class="status-dot"></span> Datos locales</span>
+            </div>
+            <p class="section-copy">Calculamos la distancia usando tu ubicación solo si la compartes. No hay datos oficiales de patrullas.</p>
+            <div class="panel p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                <div>
+                    <div class="fw-bold fs-4" id="nearbyCount">—</div>
+                    <div class="small text-secondary" id="radarStatus" aria-live="polite">Ubicación no compartida</div>
+                </div>
+                <button class="btn btn-primary" id="locateButton" type="button"><i class="bi bi-crosshair me-2"></i>Usar mi ubicación y centrar mapa</button>
+            </div>
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mt-3 mb-2">
+                <div>
+                    <div class="eyebrow">Índice relativo por zona</div>
+                    <div class="heat-index fw-bold fs-4" id="heatIndexValue">—/100</div>
+                    <div class="small text-secondary" id="heatIndexLabel">Sin reportes geolocalizados</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="small fw-semibold" for="heatPeriod">Periodo</label>
+                    <select class="form-select form-select-sm" id="heatPeriod" aria-label="Periodo del mapa de calor">
+                        <option value="1">24 horas</option>
+                        <option value="7">7 días</option>
+                        <option value="30" selected>30 días</option>
+                    </select>
+                    <button class="btn btn-outline-secondary btn-sm" id="refreshHeatMap" type="button" aria-label="Actualizar mapa" title="Actualizar mapa"><i class="bi bi-arrow-clockwise"></i></button>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+                <button class="btn btn-outline-secondary btn-sm" id="centerMyLocation" type="button">Centrar en mi ubicación</button>
+                <button class="btn btn-outline-secondary btn-sm" id="showMexico" type="button">Ver todo México</button>
+            </div>
+            <div id="incidentMap" class="heat-map" role="region" aria-label="Mapa de calor de reportes comunitarios"></div>
+            <div class="panel p-3 mt-2" id="selectedZonePanel" aria-live="polite">
+                <div class="eyebrow">Consulta de zona</div>
+                <div class="d-flex justify-content-between align-items-center gap-3">
+                    <strong id="selectedZoneLabel">Toca un punto del mapa</strong>
+                    <span class="heat-index fw-bold fs-5" id="selectedZoneIndex">—/100</span>
+                </div>
+                <div class="small text-secondary" id="selectedZoneDetails">Se calcularán reportes en un radio de 1.5 km.</div>
+            </div>
+            <div class="d-flex flex-wrap gap-3 mt-2 small" aria-label="Leyenda del mapa de calor">
+                <span class="d-flex align-items-center gap-2"><span class="map-key map-key-low"></span>Bajo: 0–33</span>
+                <span class="d-flex align-items-center gap-2"><span class="map-key map-key-medium"></span>Medio: 34–66</span>
+                <span class="d-flex align-items-center gap-2"><span class="map-key map-key-high"></span>Alto: 67–100</span>
+            </div>
+            <p class="small text-secondary mt-2 mb-0" id="heatMapStatus" aria-live="polite">Cargando reportes geolocalizados…</p>
+            <p class="small text-secondary mt-1 mb-0">Los reportes DEMO son datos sintéticos, no denuncias reales. El índice es orientativo y no representa una probabilidad delictiva ni datos oficiales.</p>
+        </section>
+
+        <section class="section" aria-labelledby="businessTitle">
+            <div class="eyebrow">Protección para comercios</div>
+            <h2 class="section-heading" id="businessTitle">Tu negocio</h2>
+            <p class="section-copy">Guarda el nombre comercial en tu cuenta para identificar este perfil en el dispositivo.</p>
+            <form id="businessForm" class="d-flex flex-column flex-sm-row gap-2">
+                <label class="visually-hidden" for="businessName">Nombre del negocio</label>
+                <input class="form-control" id="businessName" maxlength="100" placeholder="Nombre del negocio">
+                <button class="btn btn-primary flex-shrink-0" id="saveBusinessButton" type="submit">Guardar negocio</button>
+            </form>
+            <div class="small text-secondary mt-2" id="businessStatus" aria-live="polite"></div>
+        </section>
+
+        <section class="section" aria-labelledby="alertTitle">
+            <div class="eyebrow text-danger">Acción de seguridad</div>
+            <h2 class="section-heading" id="alertTitle">Alerta local</h2>
+            <p class="section-copy">Activa una cuenta regresiva cancelable. Al terminar, guarda un registro privado en este servidor.</p>
+            <div class="panel sos-panel p-3 p-sm-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="text-danger fs-3"><i class="bi bi-exclamation-octagon-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">Alerta personal, no despacho oficial</div>
+                        <p class="small text-secondary mb-3">No llama al 911 ni avisa a C5 o a tus contactos. Para una emergencia inmediata, usa el teléfono de emergencias de tu zona.</p>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button class="btn btn-danger" id="alertButton" type="button"><i class="bi bi-bell-slash me-2"></i>Iniciar cuenta regresiva</button>
+                            <button class="btn btn-outline-secondary d-none" id="cancelAlertButton" type="button">Cancelar</button>
+                            <a class="btn btn-outline-secondary" href="tel:911"><i class="bi bi-telephone me-2"></i>Llamar al 911</a>
+                        </div>
+                        <div class="d-none mt-3" id="countdownRegion" aria-live="assertive">
+                            <div class="countdown" id="countdownValue">3</div>
+                            <div class="meter" aria-hidden="true"><span id="countdownMeter"></span></div>
+                        </div>
+                        <p class="small mt-3 mb-0" id="alertStatus" aria-live="polite"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="recordTitle">
+            <div class="eyebrow">Evidencia bajo tu control</div>
+            <h2 class="section-heading" id="recordTitle">Grabación manual de audio</h2>
+            <p class="section-copy">La grabación requiere permiso del micrófono, es visible mientras está activa y se queda en tu dispositivo. Se detiene a los 60 segundos.</p>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button class="btn btn-outline-secondary" id="recordButton" type="button"><i class="bi bi-mic me-2"></i>Iniciar grabación</button>
+                <span class="small text-secondary" id="recordStatus" aria-live="polite">Micrófono apagado</span>
+            </div>
+            <div class="meter mt-3" aria-hidden="true"><span id="recordMeter"></span></div>
+            <div class="mt-3" id="recordingResult"></div>
+        </section>
+
+        <section class="section" aria-labelledby="voiceTitle">
+            <div class="eyebrow">Atajo opcional</div>
+            <h2 class="section-heading" id="voiceTitle">Frase clave mientras esta página está abierta</h2>
+            <p class="section-copy">El reconocimiento depende del navegador y puede procesarse en línea. No funciona con la pantalla bloqueada ni en segundo plano.</p>
+            <label for="voicePhrase" class="form-label small fw-semibold">Tu frase clave</label>
+            <div class="input-group">
+                <input class="form-control" id="voicePhrase" maxlength="60" value="necesito ayuda ahora" autocomplete="off">
+                <button class="btn btn-outline-secondary" id="voiceButton" type="button"><i class="bi bi-mic me-2"></i>Activar escucha</button>
+            </div>
+            <div class="small text-secondary mt-2" id="voiceStatus" aria-live="polite">La escucha está apagada.</div>
+        </section>
+
+        <section class="section" aria-labelledby="tripTitle">
+            <div class="eyebrow">Acompañamiento en este dispositivo</div>
+            <h2 class="section-heading" id="tripTitle">Planear un trayecto</h2>
+            <p class="section-copy">Con tu permiso trazamos alternativas sobre el mapa. Solo se consideran reportes reales con ubicación; las muestras DEMO no influyen en las rutas.</p>
+            <div class="row g-2">
+                <div class="col-12 col-sm-7">
+                    <label class="form-label small fw-semibold" for="destinationInput">Destino</label>
+                    <input class="form-control" id="destinationInput" maxlength="160" placeholder="Calle, lugar o dirección">
+                </div>
+                <div class="col-12 col-sm-5">
+                    <label class="form-label small fw-semibold" for="travelMode">Transporte</label>
+                    <select class="form-select" id="travelMode">
+                        <option value="walking">Caminando</option>
+                        <option value="bicycling">Bicicleta</option>
+                        <option value="transit">Transporte público</option>
+                        <option value="driving">Automóvil</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <button class="btn btn-primary" id="calculateRoutesButton" type="button"><i class="bi bi-sign-turn-right me-2"></i>Calcular rutas</button>
+                <button class="btn btn-outline-secondary" id="startTripButton" type="button" disabled><i class="bi bi-person-walking me-2"></i>Iniciar acompañamiento</button>
+                <button class="btn btn-outline-secondary d-none" id="finishTripButton" type="button">Terminar acompañamiento</button>
+            </div>
+            <div id="routeOptions" class="d-grid gap-2 mt-3" aria-live="polite"></div>
+            <div id="routeMap" class="heat-map mt-3" role="region" aria-label="Mapa de rutas sugeridas y alternativas"></div>
+            <div class="d-flex flex-wrap gap-3 mt-2 small" aria-label="Leyenda de rutas">
+                <span class="d-flex align-items-center gap-2"><span class="map-key" style="background:#1557a6"></span>Ruta sugerida</span>
+                <span class="d-flex align-items-center gap-2"><span class="map-key map-key-high"></span>Alternativa con más reportes</span>
+            </div>
+            <p class="small text-secondary mt-3 mb-0" id="tripStatus" aria-live="polite">El acompañamiento está apagado.</p>
+            <p class="small fw-semibold mt-2 mb-0" id="tripElapsed" aria-live="polite"></p>
+        </section>
+
+        <section class="section" aria-labelledby="adviceTitle">
+            <div class="eyebrow">Guía práctica</div>
+            <h2 class="section-heading" id="adviceTitle">Fraudes y situaciones de riesgo</h2>
+            <p class="section-copy">Recomendaciones generales; no sustituyen asesoría legal o atención de emergencia.</p>
+            <details class="guide">
+                <summary>Si recibes una llamada de extorsión</summary>
+                <p>No confirmes nombres, direcciones, horarios ni datos bancarios. Cuelga, contacta a la persona por un número que ya conozcas y guarda el número y la hora. Si hay peligro inmediato, aléjate a un lugar seguro y llama al servicio de emergencias local.</p>
+            </details>
+            <details class="guide">
+                <summary>Si alguien se presenta como inspector</summary>
+                <p>Pide identificación y orden oficial, verifica folio y dependencia por canales publicados oficialmente. No entregues efectivo ni compartas códigos. Si te presionan o amenazan, prioriza tu seguridad y pide apoyo.</p>
+            </details>
+            <details class="guide">
+                <summary>Antes de compartir códigos o hacer pagos</summary>
+                <p>Ningún código de un solo uso debe compartirse por llamada o mensaje. Detén la operación y llama al banco desde el número de tu tarjeta o sitio oficial. No uses enlaces ni teléfonos proporcionados por quien te contactó.</p>
+            </details>
+        </section>
+
+        <section class="section">
+            <div class="notice"><strong>Alcance:</strong> este prototipo guarda reportes y alertas en la base local del servidor. No hay conexión con C5, 911, patrullas, contactos de confianza ni una IA de transcripción.</div>
+        </section>
+    </main>
+
+    <nav class="bottom-menu"></nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const currentUser = await window.CivicAuth.getCurrentUser();
+            if (!currentUser) {
+                window.location.replace('../login/loguin.html');
+                return;
+            }
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('businessName').value = currentUser.business_name || '';
+            initializeRadar();
+            initializeIncidentHeatMap();
+            initializeBusiness();
+            initializeAlert();
+            initializeRecorder();
+            initializeVoiceShortcut();
+            initializeTrip();
+        });
+
+        let currentPosition = null;
+
+        function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Este navegador no ofrece ubicación.'));
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    position => resolve({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    }),
+                    () => reject(new Error('No se obtuvo ubicación. Puedes continuar sin compartirla.')),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            });
+        }
+
+        function distanceKm(first, second) {
+            const radians = value => value * Math.PI / 180;
+            const latitudeDelta = radians(second.latitude - first.latitude);
+            const longitudeDelta = radians(second.longitude - first.longitude);
+            const value = Math.sin(latitudeDelta / 2) ** 2
+                + Math.cos(radians(first.latitude)) * Math.cos(radians(second.latitude))
+                * Math.sin(longitudeDelta / 2) ** 2;
+            return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+        }
+
+        function initializeIncidentHeatMap() {
+            const status = document.getElementById('heatMapStatus');
+            const indexValue = document.getElementById('heatIndexValue');
+            const indexLabel = document.getElementById('heatIndexLabel');
+            const periodSelect = document.getElementById('heatPeriod');
+            const refreshButton = document.getElementById('refreshHeatMap');
+
+            if (!window.L || typeof L.heatLayer !== 'function') {
+                status.textContent = 'No se pudo cargar el mapa. Revisa tu conexión a internet.';
+                return;
+            }
+
+            const map = L.map('incidentMap', { scrollWheelZoom: false }).setView([23.6345, -102.5528], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            const heatLayer = L.heatLayer([], {
+                radius: 42,
+                blur: 30,
+                maxZoom: 15,
+                minOpacity: 0.25,
+                max: 1,
+                gradient: { 0.15: '#15966a', 0.55: '#d39119', 1: '#c52f3e' }
+            }).addTo(map);
+            const markerLayer = L.layerGroup().addTo(map);
+            let latestReports = [];
+            let selectedZoneMarker = null;
+
+            function levelFor(index) {
+                if (index >= 67) return { name: 'Alto', color: '#c52f3e' };
+                if (index >= 34) return { name: 'Medio', color: '#d39119' };
+                return { name: 'Bajo', color: '#15966a' };
+            }
+
+            function reportWeight(report, now) {
+                const severity = {
+                    'robo / asalto': 1,
+                    'violencia / riña': 1,
+                    'persona sospechosa': 0.8,
+                    'accidente vial': 0.7,
+                    vandalismo: 0.55,
+                    alumbrado: 0.4,
+                    general: 0.45
+                }[(report.category || 'general').toLocaleLowerCase('es-MX')] || 0.45;
+                const ageDays = Math.max(0, (now - Date.parse(report.created_at)) / 86400000);
+                const recency = ageDays <= 1 ? 1 : ageDays <= 7 ? 0.8 : 0.55;
+                return severity * recency;
+            }
+
+            function inspectLocation(location) {
+                const nearby = latestReports.filter(report => distanceKm(location, report) <= 1.5);
+                const weightedReports = nearby.reduce((total, report) => total + reportWeight(report, Date.now()), 0);
+                const index = Math.min(100, Math.round(weightedReports * 45));
+                const level = levelFor(index);
+                const demoCount = nearby.filter(report => report.is_demo).length;
+                const realCount = nearby.length - demoCount;
+                const position = [location.latitude, location.longitude];
+
+                document.getElementById('selectedZoneLabel').textContent = 'Punto seleccionado';
+                const selectedIndex = document.getElementById('selectedZoneIndex');
+                selectedIndex.textContent = `${index}/100`;
+                selectedIndex.style.color = level.color;
+                document.getElementById('selectedZoneDetails').textContent = nearby.length
+                    ? `${level.name} · ${nearby.length} reportes en 1.5 km (${realCount} reales, ${demoCount} DEMO).`
+                    : 'Sin reportes geolocalizados en 1.5 km durante el periodo elegido.';
+
+                if (selectedZoneMarker) selectedZoneMarker.remove();
+                selectedZoneMarker = L.circleMarker(position, {
+                    radius: 11,
+                    color: '#142438',
+                    weight: 3,
+                    fillColor: level.color,
+                    fillOpacity: 1
+                }).addTo(map);
+                selectedZoneMarker.bindPopup(`${level.name} · Índice ${index}/100<br>${nearby.length} reportes en 1.5 km`);
+            }
+
+            map.on('click', event => inspectLocation({
+                latitude: event.latlng.lat,
+                longitude: event.latlng.lng
+            }));
+            window.centerIncidentMap = position => {
+                map.setView([position.latitude, position.longitude], 14);
+                status.textContent = 'Mapa centrado en tu ubicación. Toca un punto para consultar el índice en 1.5 km.';
+            };
+            document.getElementById('centerMyLocation').addEventListener('click', () => {
+                document.getElementById('locateButton').click();
+            });
+
+            function makePopup(group, index) {
+                const content = document.createElement('div');
+                const title = document.createElement('strong');
+                title.textContent = `Índice ${index}/100 · ${levelFor(index).name}`;
+                const details = document.createElement('p');
+                details.className = 'mb-1 mt-1';
+                details.textContent = `${group.count} reporte${group.count === 1 ? '' : 's'} agrupado${group.count === 1 ? '' : 's'} en esta zona`;
+                const categories = document.createElement('small');
+                const demoNote = document.createElement('small');
+                demoNote.className = 'd-block text-primary fw-semibold';
+                demoNote.textContent = group.demoCount
+                    ? `${group.demoCount} punto${group.demoCount === 1 ? '' : 's'} DEMO (no real${group.demoCount === 1 ? '' : 'es'})`
+                    : 'Reportes comunitarios';
+                categories.textContent = [...group.categories].join(', ');
+                content.append(title, details, categories, demoNote);
+                return content;
+            }
+
+            async function refreshMap() {
+                refreshButton.disabled = true;
+                status.textContent = 'Actualizando reportes geolocalizados…';
+                try {
+                    const periodDays = Number(periodSelect.value);
+                    const cutoff = Date.now() - periodDays * 86400000;
+                    const posts = await window.CivicApi.listPosts();
+                    const reports = posts.filter(report => Number.isFinite(report.latitude)
+                        && Number.isFinite(report.longitude)
+                        && Date.parse(report.created_at) >= cutoff);
+                    latestReports = reports;
+
+                    if (reports.length === 0) {
+                        heatLayer.setLatLngs([]);
+                        markerLayer.clearLayers();
+                        indexValue.textContent = '0/100';
+                        indexLabel.textContent = 'Sin reportes geolocalizados en este periodo';
+                        status.textContent = `${posts.length} reporte${posts.length === 1 ? '' : 's'} guardado${posts.length === 1 ? '' : 's'}; ninguno tiene ubicación dentro del periodo.`;
+                        return;
+                    }
+
+                    const averageLatitude = reports.reduce((sum, report) => sum + report.latitude, 0) / reports.length;
+                    const latitudeStep = 300 / 110574;
+                    const longitudeStep = 300 / (111320 * Math.max(0.2, Math.cos(averageLatitude * Math.PI / 180)));
+                    const groups = new Map();
+                    const now = Date.now();
+
+                    reports.forEach(report => {
+                        const row = Math.floor(report.latitude / latitudeStep);
+                        const column = Math.floor(report.longitude / longitudeStep);
+                        const key = `${row}:${column}`;
+                        let group = groups.get(key);
+                        if (!group) {
+                            group = {
+                                latitude: (row + 0.5) * latitudeStep,
+                                longitude: (column + 0.5) * longitudeStep,
+                                weightedReports: 0,
+                                count: 0,
+                                demoCount: 0,
+                                categories: new Set()
+                            };
+                            groups.set(key, group);
+                        }
+                        group.weightedReports += reportWeight(report, now);
+                        group.count += 1;
+                        if (report.is_demo) group.demoCount += 1;
+                        group.categories.add(report.category || 'General');
+                    });
+
+                    heatLayer.setLatLngs([]);
+                    markerLayer.clearLayers();
+                    let highestIndex = 0;
+                    const heatPoints = [];
+                    groups.forEach(group => {
+                        const index = Math.min(100, Math.round(group.weightedReports * 45));
+                        const level = levelFor(index);
+                        highestIndex = Math.max(highestIndex, index);
+                        heatPoints.push([group.latitude, group.longitude, Math.max(0.12, index / 100)]);
+                        L.circleMarker([group.latitude, group.longitude], {
+                            radius: 7 + Math.min(6, index / 18),
+                            color: '#ffffff',
+                            weight: 2,
+                            fillColor: level.color,
+                            fillOpacity: 0.95
+                        }).bindPopup(makePopup(group, index)).addTo(markerLayer);
+                    });
+                    heatLayer.setLatLngs(heatPoints);
+                    const highestLevel = levelFor(highestIndex);
+                    indexValue.textContent = `${highestIndex}/100`;
+                    indexValue.style.color = highestLevel.color;
+                    indexLabel.textContent = `${highestLevel.name} · ${groups.size} zona${groups.size === 1 ? '' : 's'} · ${reports.length} reporte${reports.length === 1 ? '' : 's'}`;
+                    const demoCount = reports.filter(report => report.is_demo).length;
+                    status.textContent = `Agrupados en celdas de 300 m · últimos ${periodDays} día${periodDays === 1 ? '' : 's'} · ${demoCount} datos DEMO.`;
+
+                    if (currentPosition) {
+                        map.setView([currentPosition.latitude, currentPosition.longitude], 13);
+                    }
+                    window.requestAnimationFrame(() => map.invalidateSize());
+                } catch (error) {
+                    status.textContent = error.message || 'No se pudieron cargar los reportes.';
+                } finally {
+                    refreshButton.disabled = false;
+                }
+            }
+
+            periodSelect.addEventListener('change', refreshMap);
+            refreshButton.addEventListener('click', refreshMap);
+            document.getElementById('showMexico').addEventListener('click', () => {
+                currentPosition = null;
+                if (latestReports.length) {
+                    const points = latestReports.map(report => [report.latitude, report.longitude]);
+                    const bounds = L.latLngBounds(points);
+                    map.fitBounds(bounds, {
+                        paddingTopLeft: [24, 24],
+                        paddingBottomRight: [24, 88],
+                        maxZoom: 5
+                    });
+                    map.setZoom(Math.min(map.getZoom(), 5));
+                    status.textContent = `Vista nacional · ${latestReports.length} reportes geolocalizados. Toca cualquier punto para consultar su índice.`;
+                } else {
+                    map.setView([23.6345, -102.5528], 5);
+                    status.textContent = 'Vista nacional · todavía no hay reportes geolocalizados.';
+                }
+                window.requestAnimationFrame(() => map.invalidateSize());
+            });
+            refreshMap();
+        }
+
+        function initializeRadar() {
+            const button = document.getElementById('locateButton');
+            const status = document.getElementById('radarStatus');
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                status.textContent = 'Solicitando permiso de ubicación…';
+                try {
+                    currentPosition = await getLocation();
+                    if (window.centerIncidentMap) window.centerIncidentMap(currentPosition);
+                    const posts = await window.CivicApi.listPosts();
+                    const nearby = posts.filter(post => Number.isFinite(post.latitude)
+                        && Number.isFinite(post.longitude)
+                        && distanceKm(currentPosition, post) <= 1.5);
+                    document.getElementById('nearbyCount').textContent = nearby.length;
+                    status.textContent = 'Reportes con ubicación en un radio de 1.5 km';
+                } catch (error) {
+                    status.textContent = error.message;
+                    document.getElementById('nearbyCount').textContent = '—';
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        }
+
+        function initializeBusiness() {
+            const form = document.getElementById('businessForm');
+            const input = document.getElementById('businessName');
+            const button = document.getElementById('saveBusinessButton');
+            const status = document.getElementById('businessStatus');
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                button.disabled = true;
+                try {
+                    await window.CivicApi.updateBusinessName(input.value.trim());
+                    status.textContent = input.value.trim()
+                        ? 'Nombre del negocio guardado en tu cuenta.'
+                        : 'Nombre del negocio eliminado de tu cuenta.';
+                } catch (error) {
+                    status.textContent = error.message;
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        }
+
+        function initializeAlert() {
+            const alertButton = document.getElementById('alertButton');
+            const cancelButton = document.getElementById('cancelAlertButton');
+            const countdownRegion = document.getElementById('countdownRegion');
+            const countdownValue = document.getElementById('countdownValue');
+            const meter = document.getElementById('countdownMeter');
+            const status = document.getElementById('alertStatus');
+            let timerId;
+            let remaining = 3;
+            let type = 'manual';
+
+            async function finishCountdown() {
+                countdownRegion.classList.add('d-none');
+                alertButton.disabled = false;
+                cancelButton.classList.add('d-none');
+                try {
+                    const result = await window.CivicApi.createAlert(type, currentPosition);
+                    status.textContent = result.message;
+                } catch (error) {
+                    status.textContent = error.message;
+                }
+            }
+
+            window.startLocalAlert = selectedType => {
+                if (timerId) return;
+                type = selectedType;
+                remaining = 3;
+                countdownValue.textContent = remaining;
+                meter.style.width = '0%';
+                status.textContent = 'Cuenta regresiva activa; puedes cancelarla.';
+                countdownRegion.classList.remove('d-none');
+                alertButton.disabled = true;
+                cancelButton.classList.remove('d-none');
+                timerId = window.setInterval(() => {
+                    remaining -= 1;
+                    countdownValue.textContent = remaining;
+                    meter.style.width = `${((3 - remaining) / 3) * 100}%`;
+                    if (remaining <= 0) {
+                        window.clearInterval(timerId);
+                        timerId = null;
+                        finishCountdown();
+                    }
+                }, 1000);
+            };
+
+            alertButton.addEventListener('click', () => window.startLocalAlert('manual'));
+            cancelButton.addEventListener('click', () => {
+                window.clearInterval(timerId);
+                timerId = null;
+                countdownRegion.classList.add('d-none');
+                alertButton.disabled = false;
+                cancelButton.classList.add('d-none');
+                status.textContent = 'Alerta cancelada.';
+            });
+        }
+
+        function initializeRecorder() {
+            const button = document.getElementById('recordButton');
+            const status = document.getElementById('recordStatus');
+            const meter = document.getElementById('recordMeter');
+            const result = document.getElementById('recordingResult');
+            let recorder;
+            let stream;
+            let chunks = [];
+            let stopTimer;
+            let meterTimer;
+
+            button.addEventListener('click', async () => {
+                if (recorder?.state === 'recording') {
+                    recorder.stop();
+                    return;
+                }
+                if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+                    status.textContent = 'Este navegador no admite grabación de audio.';
+                    return;
+                }
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    chunks = [];
+                    recorder = new MediaRecorder(stream);
+                    recorder.addEventListener('dataavailable', event => {
+                        if (event.data.size) chunks.push(event.data);
+                    });
+                    recorder.addEventListener('stop', () => {
+                        window.clearTimeout(stopTimer);
+                        window.clearInterval(meterTimer);
+                        stream.getTracks().forEach(track => track.stop());
+                        button.innerHTML = '<i class="bi bi-mic me-2"></i>Iniciar grabación';
+                        meter.style.width = '0';
+                        status.textContent = 'Grabación detenida; el audio no se subió.';
+                        const audioUrl = URL.createObjectURL(new Blob(chunks, { type: recorder.mimeType || 'audio/webm' }));
+                        const audio = document.createElement('audio');
+                        audio.controls = true;
+                        audio.id = 'recordingAudio';
+                        const download = document.createElement('a');
+                        download.className = 'btn btn-outline-secondary btn-sm mt-2';
+                        download.href = audioUrl;
+                        download.download = `evidencia-${Date.now()}.webm`;
+                        download.textContent = 'Descargar audio';
+                        result.replaceChildren(audio, download);
+                        audio.src = audioUrl;
+                    });
+                    recorder.start();
+                    result.replaceChildren();
+                    button.innerHTML = '<i class="bi bi-stop-fill me-2"></i>Detener grabación';
+                    status.textContent = 'Grabando con permiso del micrófono; máximo 60 s.';
+                    const startedAt = Date.now();
+                    meterTimer = window.setInterval(() => {
+                        meter.style.width = `${Math.min(100, (Date.now() - startedAt) / 600)}%`;
+                    }, 200);
+                    stopTimer = window.setTimeout(() => recorder.stop(), 60000);
+                } catch {
+                    status.textContent = 'No se concedió permiso para usar el micrófono.';
+                }
+            });
+        }
+
+        function initializeVoiceShortcut() {
+            const button = document.getElementById('voiceButton');
+            const status = document.getElementById('voiceStatus');
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition;
+
+            if (!Recognition) {
+                button.disabled = true;
+                status.textContent = 'El reconocimiento de voz no está disponible en este navegador.';
+                return;
+            }
+
+            button.addEventListener('click', () => {
+                if (recognition) {
+                    recognition.stop();
+                    return;
+                }
+                const phrase = document.getElementById('voicePhrase').value.trim().toLocaleLowerCase('es-MX');
+                if (!phrase) {
+                    status.textContent = 'Escribe una frase clave primero.';
+                    return;
+                }
+                recognition = new Recognition();
+                recognition.lang = 'es-MX';
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.onresult = event => {
+                    const transcript = event.results[event.results.length - 1][0].transcript.toLocaleLowerCase('es-MX');
+                    if (transcript.includes(phrase)) {
+                        status.textContent = 'Frase reconocida; inicia una cuenta regresiva local.';
+                        window.startLocalAlert('voice');
+                    }
+                };
+                recognition.onerror = () => {
+                    status.textContent = 'El navegador detuvo el reconocimiento de voz.';
+                    recognition = null;
+                    button.innerHTML = '<i class="bi bi-mic me-2"></i>Activar escucha';
+                };
+                recognition.onend = () => {
+                    recognition = null;
+                    button.innerHTML = '<i class="bi bi-mic me-2"></i>Activar escucha';
+                    if (status.textContent === 'Escuchando mientras esta página permanece abierta.') {
+                        status.textContent = 'La escucha está apagada.';
+                    }
+                };
+                try {
+                    recognition.start();
+                    button.innerHTML = '<i class="bi bi-mic-mute me-2"></i>Detener escucha';
+                    status.textContent = 'Escuchando mientras esta página permanece abierta.';
+                } catch {
+                    recognition = null;
+                    status.textContent = 'No se pudo iniciar el reconocimiento de voz.';
+                }
+            });
+        }
+
+        function initializeTrip() {
+            const calculateButton = document.getElementById('calculateRoutesButton');
+            const startButton = document.getElementById('startTripButton');
+            const finishButton = document.getElementById('finishTripButton');
+            const status = document.getElementById('tripStatus');
+            const elapsed = document.getElementById('tripElapsed');
+            const routeOptions = document.getElementById('routeOptions');
+            const routeMapContainer = document.getElementById('routeMap');
+            let routeMap = null;
+            let routeLayer = null;
+            let plannedTrip = null;
+            let tripTimer;
+            let startedAt;
+
+            function updateElapsed() {
+                const minutes = Math.floor((Date.now() - startedAt) / 60000);
+                elapsed.textContent = `Trayecto activo: ${minutes} min`;
+            }
+
+            function activateTrip(destination, startTime, directionsLink = null) {
+                startedAt = Date.parse(startTime);
+                const tripMessage = document.createTextNode(
+                    `Acompañamiento local activo hacia ${destination}. Esta pestaña no comparte tu ubicación.`
+                );
+                status.replaceChildren(tripMessage);
+                if (directionsLink) {
+                    status.append(document.createTextNode(' '), directionsLink);
+                }
+                startButton.classList.add('d-none');
+                finishButton.classList.remove('d-none');
+                updateElapsed();
+                tripTimer = window.setInterval(updateElapsed, 15000);
+            }
+
+            function ensureRouteMap(origin) {
+                if (!routeMap) {
+                    routeMap = L.map(routeMapContainer, { scrollWheelZoom: false });
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(routeMap);
+                    routeLayer = L.layerGroup().addTo(routeMap);
+                }
+                routeMap.setView([origin.latitude, origin.longitude], 13);
+                window.requestAnimationFrame(() => routeMap.invalidateSize());
+            }
+
+            async function geocodeDestination(destination) {
+                const query = new URLSearchParams({
+                    q: destination,
+                    format: 'jsonv2',
+                    limit: '1',
+                    countrycodes: 'mx'
+                });
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?${query}`, {
+                    headers: { 'Accept-Language': 'es-MX' }
+                });
+                if (!response.ok) throw new Error('No se pudo buscar el destino. Intenta de nuevo.');
+                const places = await response.json();
+                if (!places.length) throw new Error('No encontramos ese destino en México. Prueba con una dirección más completa.');
+                return {
+                    latitude: Number(places[0].lat),
+                    longitude: Number(places[0].lon),
+                    label: places[0].display_name.split(',').slice(0, 3).join(',')
+                };
+            }
+
+            async function requestRoutes(points, service) {
+                const coordinates = points.map(point => `${point.longitude},${point.latitude}`).join(';');
+                const query = new URLSearchParams({ alternatives: '2', overview: 'full', geometries: 'geojson' });
+                const response = await fetch(`https://routing.openstreetmap.de/${service}/route/v1/driving/${coordinates}?${query}`);
+                if (!response.ok) throw new Error('El servicio de rutas no respondió. Intenta más tarde.');
+                const result = await response.json();
+                if (result.code !== 'Ok' || !result.routes?.length) throw new Error('No se pudo trazar una ruta para esos puntos.');
+                return result.routes;
+            }
+
+            async function routeAlternatives(origin, destination, mode) {
+                const services = {
+                    walking: 'routed-foot',
+                    bicycling: 'routed-bike',
+                    driving: 'routed-car'
+                };
+                const service = services[mode];
+                if (!service) {
+                    throw new Error('El mapa traza rutas a pie, en bicicleta o en auto. Para transporte público consulta el enlace externo de mapas.');
+                }
+
+                const routes = await requestRoutes([origin, destination], service);
+                if (routes.length >= 2) return routes.slice(0, 2);
+
+                const latitudeDelta = destination.latitude - origin.latitude;
+                const longitudeDelta = (destination.longitude - origin.longitude)
+                    * Math.cos(origin.latitude * Math.PI / 180);
+                const length = Math.hypot(latitudeDelta, longitudeDelta) || 1;
+                const offset = Math.min(0.025, Math.max(0.006, length * 0.18));
+                const midpoint = {
+                    latitude: (origin.latitude + destination.latitude) / 2 - longitudeDelta / length * offset,
+                    longitude: (origin.longitude + destination.longitude) / 2
+                        + latitudeDelta / length * offset / Math.cos(origin.latitude * Math.PI / 180)
+                };
+
+                try {
+                    const detour = await requestRoutes([origin, midpoint, destination], service);
+                    const candidate = detour[0];
+                    if (candidate && Math.abs(candidate.distance - routes[0].distance) > 200) {
+                        return [routes[0], candidate];
+                    }
+                } catch {
+                    // If the detour cannot be routed, keep the valid primary route.
+                }
+                return routes;
+            }
+
+            function scoreRoute(route, reports) {
+                const coordinates = route.geometry.coordinates;
+                const step = Math.max(1, Math.floor(coordinates.length / 180));
+                const samples = coordinates.filter((point, index) => index % step === 0 || index === coordinates.length - 1)
+                    .map(([longitude, latitude]) => ({ latitude, longitude }));
+                const nearby = reports.filter(report => samples.some(point => distanceKm(point, report) <= 0.25));
+                const weights = {
+                    'robo / asalto': 1,
+                    'violencia / riña': 1,
+                    'persona sospechosa': 0.8,
+                    'accidente vial': 0.7,
+                    vandalismo: 0.55,
+                    alumbrado: 0.4,
+                    general: 0.45
+                };
+                const score = nearby.reduce((total, report) => {
+                    const category = (report.category || 'general').toLocaleLowerCase('es-MX');
+                    return total + (weights[category] || 0.45);
+                }, 0);
+                return { reports: nearby.length, index: Math.min(100, Math.round(score * 45)) };
+            }
+
+            function routeCard(title, route, score, color, note, linkUrl) {
+                const card = document.createElement('article');
+                card.className = 'panel p-3';
+                const heading = document.createElement('div');
+                heading.className = 'd-flex justify-content-between align-items-start gap-2';
+                const name = document.createElement('strong');
+                name.textContent = title;
+                const badge = document.createElement('span');
+                badge.className = 'small fw-semibold';
+                badge.style.color = color;
+                badge.textContent = score.reports
+                    ? `Índice ${score.index}/100 · ${score.reports} reportes`
+                    : 'Sin reportes cercanos';
+                heading.append(name, badge);
+                const details = document.createElement('p');
+                details.className = 'small text-secondary mt-2 mb-1';
+                details.textContent = `${(route.distance / 1000).toFixed(1)} km · ${Math.round(route.duration / 60)} min · ${note}`;
+                const link = document.createElement('a');
+                link.href = linkUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'small';
+                link.textContent = 'Abrir indicaciones externas';
+                card.append(heading, details, link);
+                return card;
+            }
+
+            function drawRoutes(routes, scores, reports, origin, destination, mode) {
+                if (!routeMap) ensureRouteMap(origin);
+                routeLayer.clearLayers();
+
+                const riskDataAvailable = reports.length > 0;
+                const [firstRoute, secondRoute] = routes;
+                let followIndex = 0;
+                let avoidIndex = 1;
+                if (secondRoute && riskDataAvailable && scores[0].index > scores[1].index) {
+                    followIndex = 1;
+                    avoidIndex = 0;
+                } else if (secondRoute && !riskDataAvailable && routes[1].duration < routes[0].duration) {
+                    followIndex = 1;
+                    avoidIndex = 0;
+                }
+
+                const follow = routes[followIndex];
+                const followScore = scores[followIndex];
+                const routeCoordinates = follow.geometry.coordinates.map(([longitude, latitude]) => [latitude, longitude]);
+                const followLine = L.polyline(routeCoordinates, { color: '#1557a6', weight: 6, opacity: 0.95 });
+                followLine.bindPopup('Ruta sugerida');
+                followLine.addTo(routeLayer);
+
+                const bounds = L.latLngBounds(routeCoordinates);
+                if (secondRoute) {
+                    const avoid = routes[avoidIndex];
+                    const avoidScore = scores[avoidIndex];
+                    const avoidCoordinates = avoid.geometry.coordinates.map(([longitude, latitude]) => [latitude, longitude]);
+                    const avoidLine = L.polyline(avoidCoordinates, {
+                        color: '#c52f3e',
+                        weight: 5,
+                        opacity: 0.9,
+                        dashArray: '9 8'
+                    });
+                    avoidLine.bindPopup('Ruta alternativa para evitar');
+                    avoidLine.addTo(routeLayer);
+                    bounds.extend(avoidCoordinates);
+                    const avoidTitle = riskDataAvailable && avoidScore.index > followScore.index
+                        ? 'Ruta a evitar · más reportes cercanos'
+                        : 'Ruta alternativa · peligrosidad sin clasificar';
+                    const avoidNote = riskDataAvailable
+                        ? (avoidScore.index > followScore.index ? 'Mayor exposición a reportes reales geolocalizados' : 'Sin diferencia de reportes reales respecto a la sugerida')
+                        : 'No hay reportes reales geolocalizados para estimar peligro';
+                    routeOptions.append(routeCard(avoidTitle, avoid, avoidScore, '#c52f3e', avoidNote,
+                        makeDirectionsUrl(origin, destination, mode)));
+                } else {
+                    const unavailable = document.createElement('p');
+                    unavailable.className = 'small text-secondary';
+                    unavailable.textContent = 'El proveedor solo devolvió una ruta; no hay una alternativa que podamos mostrar.';
+                    routeOptions.append(unavailable);
+                }
+
+                const startMarker = L.circleMarker([origin.latitude, origin.longitude], {
+                    radius: 8, color: '#ffffff', weight: 2, fillColor: '#1557a6', fillOpacity: 1
+                }).bindPopup('Origen');
+                const destinationMarker = L.circleMarker([destination.latitude, destination.longitude], {
+                    radius: 8, color: '#ffffff', weight: 2, fillColor: '#142438', fillOpacity: 1
+                }).bindPopup('Destino');
+                startMarker.addTo(routeLayer);
+                destinationMarker.addTo(routeLayer);
+                bounds.extend([origin.latitude, origin.longitude]);
+                bounds.extend([destination.latitude, destination.longitude]);
+                routeMap.fitBounds(bounds, { padding: [24, 32], maxZoom: 14 });
+
+                const followNote = riskDataAvailable
+                    ? 'Menor exposición a reportes reales geolocalizados'
+                    : 'Trayecto sugerido; sin datos reales suficientes para estimar peligrosidad';
+                routeOptions.prepend(routeCard('Ruta a seguir', follow, followScore, '#1557a6', followNote,
+                    makeDirectionsUrl(origin, destination, mode)));
+                window.requestAnimationFrame(() => routeMap.invalidateSize());
+            }
+
+            function makeDirectionsUrl(origin, destination, mode) {
+                const directions = new URL('https://www.google.com/maps/dir/');
+                directions.searchParams.set('api', '1');
+                directions.searchParams.set('origin', `${origin.latitude},${origin.longitude}`);
+                directions.searchParams.set('destination', `${destination.latitude},${destination.longitude}`);
+                directions.searchParams.set('travelmode', mode === 'walking' ? 'walking' : mode === 'bicycling' ? 'bicycling' : mode === 'transit' ? 'transit' : 'driving');
+                return directions.href;
+            }
+
+            try {
+                const savedTrip = JSON.parse(window.localStorage.getItem('civicmx.activeTrip') || 'null');
+                if (savedTrip?.destination && savedTrip?.startedAt) {
+                    activateTrip(savedTrip.destination, savedTrip.startedAt);
+                }
+            } catch {
+                window.localStorage.removeItem('civicmx.activeTrip');
+            }
+
+            calculateButton.addEventListener('click', async () => {
+                const destination = document.getElementById('destinationInput').value.trim();
+                if (!destination) {
+                    status.textContent = 'Escribe un destino para calcular las rutas.';
+                    document.getElementById('destinationInput').focus();
+                    return;
+                }
+                calculateButton.disabled = true;
+                routeOptions.replaceChildren();
+                status.textContent = 'Buscando el destino y calculando alternativas…';
+                try {
+                    currentPosition = await getLocation();
+                    const destinationPoint = await geocodeDestination(destination);
+                    const mode = document.getElementById('travelMode').value;
+                    if (mode === 'transit') {
+                        status.textContent = 'El mapa de rutas internas no incluye transporte público. Usa las indicaciones externas.';
+                        const link = document.createElement('a');
+                        link.href = makeDirectionsUrl(currentPosition, destinationPoint, mode);
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.className = 'btn btn-primary mt-2';
+                        link.textContent = 'Abrir ruta de transporte público';
+                        routeOptions.replaceChildren(link);
+                        return;
+                    }
+                    const [routes, posts] = await Promise.all([
+                        routeAlternatives(currentPosition, destinationPoint, mode),
+                        window.CivicApi.listPosts()
+                    ]);
+                    const cutoff = Date.now() - 30 * 86400000;
+                    const realReports = posts.filter(report => !report.is_demo
+                        && Number.isFinite(report.latitude)
+                        && Number.isFinite(report.longitude)
+                        && Date.parse(report.created_at) >= cutoff);
+                    const scores = routes.map(route => scoreRoute(route, realReports));
+                    routeMapContainer.classList.remove('d-none');
+                    ensureRouteMap(currentPosition);
+                    drawRoutes(routes, scores, realReports, currentPosition, destinationPoint, mode);
+                    plannedTrip = {
+                        destination: destinationPoint.label,
+                        directionsLink: makeDirectionsUrl(currentPosition, destinationPoint, mode)
+                    };
+                    startButton.disabled = false;
+                    status.textContent = realReports.length
+                        ? 'Las rutas se comparan con reportes reales geolocalizados de los últimos 30 días.'
+                        : 'No hay reportes reales geolocalizados para clasificar el peligro; la alternativa no se considera insegura.';
+                } catch (error) {
+                    status.textContent = error.message;
+                    routeMapContainer.classList.add('d-none');
+                    plannedTrip = null;
+                    startButton.disabled = true;
+                } finally {
+                    calculateButton.disabled = false;
+                }
+            });
+
+            startButton.addEventListener('click', async () => {
+                if (!plannedTrip) return;
+                const destination = plannedTrip.destination;
+                const startTime = new Date().toISOString();
+                window.localStorage.setItem('civicmx.activeTrip', JSON.stringify({ destination, startedAt: startTime }));
+                activateTrip(destination, startTime);
+                try {
+                    await window.CivicApi.completeMission('safe_route');
+                } catch (error) {
+                    status.append(document.createTextNode(` ${error.message}`));
+                }
+                window.open(plannedTrip.directionsLink, '_blank', 'noopener');
+            });
+
+            finishButton.addEventListener('click', () => {
+                window.clearInterval(tripTimer);
+                window.localStorage.removeItem('civicmx.activeTrip');
+                status.textContent = 'Acompañamiento local terminado.';
+                elapsed.textContent = '';
+                startButton.classList.remove('d-none');
+                finishButton.classList.add('d-none');
+            });
+        }
+    </script>
+</body>
+</html>

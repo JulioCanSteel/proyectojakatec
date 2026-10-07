@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Misiones</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+       body {
+            padding-bottom: 80px;
+            }
+
+            .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            z-index: 1000;
+            }
+
+            .bottom-menu a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #6c757d;
+            font-size: 11px;
+            text-decoration: none;
+            }
+
+            .bottom-menu i {
+            font-size: 20px;
+            }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        
+        /* Tarjetas de misiones y estadísticas */
+        .custom-card {
+            background-color: var(--light-grey);
+            border-radius: 16px;
+            border: 1px solid var(--medium-grey);
+            padding: 16px;
+        }
+
+        /* Barras de progreso */
+        .progress {
+            height: 6px; /* Equivalente al minHeight: 6 de Flutter */
+            background-color: var(--medium-grey);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-teal);
+            border-radius: 8px;
+        }
+
+        /* Logros (Badges) */
+        .achievement-box {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 193, 7, 0.1); /* accentAmber.withValues(alpha: 0.1) */
+            border-radius: 12px;
+            border: 2px solid var(--accent-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 4px auto;
+        }
+
+        .achievement-label {
+            font-size: 10px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+            width: 60px;
+        }
+        </style>
+        <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+<nav class="bottom-menu"></nav>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-trophy-fill text-teal fs-3 me-2"></i> <!-- Equivalente a Icons.emoji_events -->
+                <div>
+                    <span class="app-brand">HeroesMX</span>
+                    <h4 class="mb-0 fw-bold">Misiones</h4>
+                </div>
+            </div>
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                <span id="headerCoins">0</span>
+                <span class="ms-1">🪙</span>
+            </div>
+        </header>
+
+        <!-- MISIONES DIARIAS -->
+        <div class="px-4 mb-4 mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Misiones Diarias</h5>
+                <small class="text-muted" style="font-size: 12px;">Se renuevan a medianoche</small>
+            </div>
+            
+            <div id="dailyMissionsContainer">
+                <!-- Las misiones se renderizarán aquí mediante JavaScript -->
+            </div>
+        </div>
+
+        <!-- DESAFÍOS SEMANALES -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Desafíos Semanales</h5>
+            
+            <div class="custom-card d-flex justify-content-between align-items-center mb-2">
+                <span>Reportes esta semana</span>
+                <strong id="weeklyReports">0</strong>
+            </div>
+            <div class="custom-card d-flex justify-content-between align-items-center">
+                <span>Puntos esta semana</span>
+                <strong id="weeklyPoints">0</strong>
+            </div>
+        </div>
+
+        <!-- LOGROS DESBLOQUEADOS -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Logros Desbloqueados</h5>
+            <div class="d-flex flex-wrap gap-3" id="achievementsContainer">
+                <!-- Logros calculados a partir de actividad real -->
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="px-4 mb-4">
+            <div class="custom-card p-4">
+                <div class="d-flex justify-content-evenly text-center">
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statCompletadas">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Completadas</div>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statSemana">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Esta semana</div>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold text-teal" id="statGanancias">0</div>
+                        <div class="text-muted mt-1" style="font-size: 12px;">Total ganancias</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const [dashboard, missions] = await Promise.all([
+                    window.CivicApp.loadDashboard(),
+                    window.CivicApi.getMissions()
+                ]);
+                document.getElementById('statGanancias').textContent = dashboard.stats.coins;
+                document.getElementById('weeklyReports').textContent = dashboard.stats.weekly_reports;
+                document.getElementById('weeklyPoints').textContent = dashboard.stats.weekly_points;
+                renderMissions(missions);
+                renderAchievements(dashboard.achievements);
+            } catch (error) {
+                window.CivicApp.showMessage(error.message);
+            }
+        });
+
+        function renderMissions(missions) {
+            const container = document.getElementById('dailyMissionsContainer');
+            container.replaceChildren(...missions.map(mission => {
+                const card = document.createElement('article');
+                card.className = 'custom-card mb-3';
+                const heading = document.createElement('div');
+                heading.className = 'd-flex align-items-center gap-3';
+                const icon = document.createElement('i');
+                icon.className = `bi ${mission.icon} text-teal fs-4`;
+                const titleWrap = document.createElement('div');
+                titleWrap.className = 'flex-grow-1';
+                const title = document.createElement('h6');
+                title.className = 'fw-bold mb-1';
+                title.textContent = mission.title;
+                const description = document.createElement('small');
+                description.className = 'text-muted';
+                description.textContent = mission.description;
+                titleWrap.append(title, description);
+                heading.append(icon, titleWrap);
+
+                const reward = document.createElement('p');
+                reward.className = 'small text-muted mt-3 mb-2';
+                reward.textContent = `+${mission.points} puntos · +${mission.coins} monedas`;
+                const progress = document.createElement('div');
+                progress.className = 'progress';
+                const bar = document.createElement('div');
+                bar.className = 'progress-bar';
+                bar.setAttribute('role', 'progressbar');
+                bar.style.width = mission.completed ? '100%' : '0%';
+                progress.append(bar);
+
+                let action;
+                if (mission.completed) {
+                    action = document.createElement('button');
+                    action.className = 'btn btn-outline-secondary btn-sm mt-3';
+                    action.disabled = true;
+                    action.textContent = 'Completada hoy';
+                } else if (mission.action === 'report') {
+                    action = document.createElement('a');
+                    action.className = 'btn btn-primary btn-sm mt-3';
+                    action.href = '../feed/index.html';
+                    action.textContent = 'Crear reporte';
+                } else if (mission.action === 'route') {
+                    action = document.createElement('a');
+                    action.className = 'btn btn-primary btn-sm mt-3';
+                    action.href = '../seguridad/index.html#tripTitle';
+                    action.textContent = 'Planear trayecto';
+                } else {
+                    action = document.createElement('button');
+                    action.className = 'btn btn-primary btn-sm mt-3';
+                    action.textContent = 'Completar';
+                    action.addEventListener('click', async () => {
+                        action.disabled = true;
+                        try {
+                            await window.CivicApi.completeMission(mission.id);
+                            window.location.reload();
+                        } catch (error) {
+                            window.CivicApp.showMessage(error.message);
+                            action.disabled = false;
+                        }
+                    });
+                }
+
+                card.append(heading, reward, progress, action);
+                return card;
+            }));
+        }
+
+        function renderAchievements(achievements) {
+            const container = document.getElementById('achievementsContainer');
+            if (!achievements.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-muted small';
+                empty.textContent = 'Completa actividades para desbloquear logros.';
+                container.replaceChildren(empty);
+                return;
+            }
+            container.replaceChildren(...achievements.map(achievement => {
+                const badge = document.createElement('div');
+                badge.className = 'd-flex flex-column align-items-center';
+                const iconBox = document.createElement('div');
+                iconBox.className = 'achievement-box';
+                const icon = document.createElement('i');
+                icon.className = `bi ${achievement.icon}`;
+                iconBox.append(icon);
+                const label = document.createElement('div');
+                label.className = 'achievement-label text-muted';
+                label.textContent = achievement.label;
+                badge.append(iconBox, label);
+                return badge;
+            }));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Crear Cuenta</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Variables de AppTheme */
+        :root {
+            --primary-teal: #008080;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+        }
+
+        /* Contenedor principal (SafeArea & SingleChildScrollView) */
+        .signup-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Utilidades de color */
+        .text-teal { color: var(--primary-teal) !important; }
+        
+        /* Estilos de inputs */
+        .form-control, .input-group-text {
+            border-radius: var(--border-radius);
+            padding: 12px 16px;
+            border-color: #ced4da;
+        }
+        
+        .input-group:focus-within .form-control, 
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary-teal);
+            box-shadow: none;
+            border-width: 2px;
+        }
+
+        /* Casilla de verificación (Checkbox) */
+        .form-check-input:checked {
+            background-color: var(--primary-teal);
+            border-color: var(--primary-teal);
+        }
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 128, 128, 0.25);
+        }
+
+        /* Estilos de botón principal */
+        .btn-teal {
+            background-color: var(--primary-teal);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            font-weight: 700;
+        }
+        
+        .btn-teal:hover, .btn-teal:focus {
+            background-color: #006666;
+            color: white;
+        }
+        
+        .btn-teal:disabled {
+            background-color: #bdbdbd;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+
+    <div class="signup-wrapper">
+        <div class="signup-container">
+            
+            <!-- Header con botón atrás -->
+            <div class="d-flex align-items-center mb-2">
+                <button type="button" class="btn btn-link text-teal p-0 me-3 border-0" onclick="window.history.back()" style="text-decoration: none;">
+                    <i class="bi bi-arrow-left fs-3"></i>
+                </button>
+                <div class="flex-grow-1 text-center">
+                    <div class="app-brand">HeroesMX</div>
+                    <h1 class="text-teal fw-bold fs-4 mb-0">Crear Cuenta</h1>
+                </div>
+                <!-- Espaciador para centrar el título correctamente -->
+                <div style="width: 32px;"></div>
+            </div>
+
+            <!-- Subtítulo -->
+            <p class="text-muted text-center fs-6 mb-4">Únete a nuestra comunidad</p>
+
+            <form id="signupForm" novalidate>
+                
+                <!-- Input de Nombre -->
+                <div class="mb-3 text-start">
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-person text-teal"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="nameInput" placeholder="Nombre Completo" required>
+                        <div class="invalid-feedback" id="nameError">Por favor, ingresa tu nombre</div>
+                    </div>
+                </div>
+
+                <!-- Input de Correo -->
+                <div class="mb-3 text-start">
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-envelope text-teal"></i>
+                        </span>
+                        <input type="email" class="form-control border-start-0 ps-0" id="emailInput" placeholder="Correo Electrónico" required>
+                        <div class="invalid-feedback" id="emailError">Por favor, ingresa tu correo</div>
+                    </div>
+                </div>
+
+                <!-- Input de Contraseña -->
+                <div class="mb-3 text-start">
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-lock text-teal"></i>
+                        </span>
+                        <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="passwordInput" placeholder="Contraseña" required>
+                        <span class="input-group-text bg-white border-start-0" id="togglePassword1" style="cursor: pointer;">
+                            <i class="bi bi-eye-slash text-secondary" id="iconPassword1"></i>
+                        </span>
+                        <div class="invalid-feedback" id="passwordError">Por favor, ingresa tu contraseña</div>
+                    </div>
+                </div>
+
+                <!-- Input de Confirmar Contraseña -->
+                <div class="mb-4 text-start">
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-lock text-teal"></i>
+                        </span>
+                        <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="confirmPasswordInput" placeholder="Confirmar Contraseña" required>
+                        <span class="input-group-text bg-white border-start-0" id="togglePassword2" style="cursor: pointer;">
+                            <i class="bi bi-eye-slash text-secondary" id="iconPassword2"></i>
+                        </span>
+                        <div class="invalid-feedback" id="confirmPasswordError">Por favor, confirma tu contraseña</div>
+                    </div>
+                </div>
+
+                <!-- Checkbox de Términos -->
+                <div class="form-check mb-4 d-flex align-items-center">
+                    <input class="form-check-input mt-0 me-2" type="checkbox" id="termsCheckbox">
+                    <label class="form-check-label text-muted" for="termsCheckbox" style="font-size: 14px; cursor: pointer;">
+                        Acepto los términos y condiciones
+                    </label>
+                </div>
+
+                <!-- Botón de Crear Cuenta -->
+                <div class="d-grid gap-2 mb-4">
+                    <button type="submit" class="btn btn-teal d-flex justify-content-center align-items-center" id="signupBtn">
+                        <span id="btnText">Crear Cuenta</span>
+                        <div class="spinner-border spinner-border-sm text-light ms-2 d-none" id="signupSpinner" role="status"></div>
+                    </button>
+                </div>
+
+                <!-- Link a Login -->
+                <div class="text-center mt-3">
+                    <span class="text-muted" style="font-size: 14px;">¿Ya tienes cuenta? </span>
+                    <a href="../login/loguin.html" class="text-teal fw-bold text-decoration-none" style="font-size: 14px;">Inicia Sesión</a>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+    <!-- SnackBar (Toast de Bootstrap) -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="actionSnackBar" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body text-white" id="snackBarMessage">Mensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../auth.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias
+            const signupForm = document.getElementById('signupForm');
+            const nameInput = document.getElementById('nameInput');
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            
+            const btnText = document.getElementById('btnText');
+            const signupBtn = document.getElementById('signupBtn');
+            const signupSpinner = document.getElementById('signupSpinner');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Función para alternar visibilidad de contraseñas
+            function setupPasswordToggle(toggleId, inputId, iconId) {
+                const toggle = document.getElementById(toggleId);
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+
+                toggle.addEventListener('click', () => {
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    icon.classList.toggle('bi-eye');
+                    icon.classList.toggle('bi-eye-slash');
+                });
+            }
+
+            setupPasswordToggle('togglePassword1', 'passwordInput', 'iconPassword1');
+            setupPasswordToggle('togglePassword2', 'confirmPasswordInput', 'iconPassword2');
+
+            // Manejo del Toast (SnackBar)
+            const toastEl = document.getElementById('actionSnackBar');
+            const snackBar = new bootstrap.Toast(toastEl, { delay: 4000 });
+            const snackBarMessage = document.getElementById('snackBarMessage');
+
+            function showSnackBar(message, isError = true) {
+                snackBarMessage.textContent = message;
+                if (isError) {
+                    toastEl.classList.remove('text-bg-success');
+                    toastEl.classList.add('text-bg-danger');
+                } else {
+                    toastEl.classList.remove('text-bg-danger');
+                    toastEl.classList.add('text-bg-success');
+                }
+                snackBar.show();
+            }
+
+            // Lógica de Validación y Envío
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let isValid = true;
+
+                // Validar Nombre
+                if (!nameInput.value.trim() || nameInput.value.length < 3) {
+                    nameInput.classList.add('is-invalid');
+                    document.getElementById('nameError').textContent = nameInput.value ? 'El nombre debe tener al menos 3 caracteres' : 'Por favor, ingresa tu nombre';
+                    isValid = false;
+                }
+
+                // Validar Correo
+                if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+                    emailInput.classList.add('is-invalid');
+                    document.getElementById('emailError').textContent = emailInput.value ? 'Ingresa un correo válido' : 'Por favor, ingresa tu correo';
+                    isValid = false;
+                }
+
+                // Validar Contraseña
+                if (!passwordInput.value || passwordInput.value.length < 6) {
+                    passwordInput.classList.add('is-invalid');
+                    document.getElementById('passwordError').textContent = passwordInput.value ? 'La contraseña debe tener al menos 6 caracteres' : 'Por favor, ingresa tu contraseña';
+                    isValid = false;
+                }
+
+                // Validar Confirmación
+                if (!confirmPasswordInput.value || confirmPasswordInput.value !== passwordInput.value) {
+                    confirmPasswordInput.classList.add('is-invalid');
+                    document.getElementById('confirmPasswordError').textContent = !confirmPasswordInput.value ? 'Por favor, confirma tu contraseña' : 'Las contraseñas no coinciden';
+                    isValid = false;
+                }
+
+                // Validar Checkbox Términos (SnackBar en vez de input rojo)
+                if (isValid && !termsCheckbox.checked) {
+                    showSnackBar('Debes aceptar los términos y condiciones', true);
+                    return;
+                }
+
+                if (isValid && termsCheckbox.checked) {
+                    // Estado de carga
+                    signupBtn.disabled = true;
+                    btnText.textContent = '';
+                    signupSpinner.classList.remove('d-none');
+
+                    try {
+                        await window.CivicAuth.register(
+                            nameInput.value.trim(),
+                            emailInput.value.trim(),
+                            passwordInput.value
+                        );
+                        showSnackBar('¡Cuenta creada exitosamente!', false);
+                        setTimeout(() => {
+                            window.location.href = '../feed/index.html';
+                        }, 1000);
+                    } catch (error) {
+                        showSnackBar(error.message || 'Ocurrió un error inesperado', true);
+                        signupBtn.disabled = false;
+                        btnText.textContent = 'Crear Cuenta';
+                        signupSpinner.classList.add('d-none');
+                    }
+                }
+            });
+
+            // Limpiar errores al escribir
+            const inputs = [nameInput, emailInput, passwordInput, confirmPasswordInput];
+            inputs.forEach(input => {
+                input.addEventListener('input', () => input.classList.remove('is-invalid'));
+            });
+        });
+    </script>
+</body>
+</html>

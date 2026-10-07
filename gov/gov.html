@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroesMX | Trámites y Servicios</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Poppins & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-teal: #008080;
+            --accent-amber: #ffc107;
+            --light-grey: #f8f9fa;
+            --medium-grey: #e9ecef;
+            --dark-grey: #6c757d;
+        }
+
+        body {
+            padding-bottom: 80px;
+            }
+
+            .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            z-index: 1000;
+            }
+
+            .bottom-menu a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #6c757d;
+            font-size: 11px;
+            text-decoration: none;
+            }
+
+            .bottom-menu i {
+            font-size: 20px;
+            }
+
+        .font-space {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .text-teal { color: var(--primary-teal); }
+        .bg-amber { background-color: var(--accent-amber); }
+        .bg-light-grey { background-color: var(--light-grey); }
+        .bg-teal { background-color: var(--primary-teal); }
+
+        /* Barra de búsqueda */
+        .search-container {
+            background-color: var(--light-grey);
+            border-radius: 24px;
+            border: 1px solid var(--medium-grey);
+            display: flex;
+            align-items: center;
+            padding: 4px 16px;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-input::placeholder { color: var(--dark-grey); }
+
+        /* Cuadrícula de Servicios */
+        .service-card {
+            border-radius: 16px;
+            padding: 24px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .service-card:active { transform: scale(0.98); }
+
+        .service-card.bordered { border: 1px solid var(--medium-grey); }
+
+        /* Guía Rápida */
+        .guide-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--medium-grey);
+            padding: 20px;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        /* Preguntas Frecuentes (Acordeón personalizado) */
+        .accordion-item {
+            border: 1px solid var(--medium-grey);
+            border-radius: 16px !important;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        
+        .accordion-button {
+            border-radius: 16px !important;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 16px;
+            box-shadow: none !important;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background-color: var(--light-grey);
+            color: black;
+        }
+        
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23008080'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+
+        .accordion-body {
+            font-size: 12px;
+            color: var(--dark-grey);
+            background-color: var(--light-grey);
+            padding-top: 0;
+        }
+
+        /* Botones */
+        .btn-teal {
+            background-color: var(--primary-teal);
+            color: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn-teal:hover { background-color: #006666; color: white; }
+        </style>
+        <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+<nav class="bottom-menu"></nav>
+
+    <div class="container-fluid p-0" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- HEADER -->
+        <header class="d-flex justify-content-between align-items-center px-4 py-3 bg-white sticky-top">
+            <div>
+                <div class="app-brand">HeroesMX</div>
+                <div class="d-flex align-items-center mb-1">
+                    <i class="bi bi-wallet2 text-teal fs-5 me-2"></i>
+                    <span class="fw-medium" style="font-size: 16px;">Consultas</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-file-earmark-text-fill text-teal fs-5 me-2"></i>
+                    <span class="fw-bold text-teal" style="font-size: 16px;">Trámites</span>
+                </div>
+            </div>
+            
+            <div class="bg-amber rounded-pill px-3 py-1 d-flex flex-column align-items-center font-space">
+                <div class="fw-bold" style="font-size: 14px;" id="headerCoins">0</div>
+                <div class="fw-bold d-flex align-items-center" style="font-size: 12px;">
+                    <span class="me-1">•</span> <span id="headerStreak">0</span> <span class="ms-1">🔥</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- SEARCH BAR -->
+        <div class="px-4 mb-4 mt-2">
+            <div class="search-container">
+                <i class="bi bi-search text-secondary fs-5"></i>
+                <input type="text" class="search-input font-poppins" placeholder="Busca un trámite o servicio..." id="searchInput">
+            </div>
+        </div>
+
+        <!-- SERVICIOS GRID -->
+        <div class="px-4 mb-4">
+            <div class="row g-3">
+                <!-- Predial -->
+                <div class="col-6">
+                    <div class="service-card bg-teal text-white" role="button" tabindex="0" onclick="openServiceInfo('Predial')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openServiceInfo('Predial')}">
+                        <i class="bi bi-house-door-fill" style="font-size: 40px;"></i>
+                        <div class="fw-bold mt-2" style="font-size: 14px;">Predial</div>
+                    </div>
+                </div>
+                <!-- Licencia de conductor -->
+                <div class="col-6">
+                    <div class="service-card bg-amber text-dark" role="button" tabindex="0" onclick="openServiceInfo('Licencia de conducir')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openServiceInfo('Licencia de conducir')}">
+                        <i class="bi bi-car-front-fill" style="font-size: 40px;"></i>
+                        <div class="fw-bold mt-2" style="font-size: 14px;">Licencia de<br>conductor</div>
+                    </div>
+                </div>
+                <!-- Actas de nacimiento -->
+                <div class="col-6">
+                    <div class="service-card bg-light-grey text-dark bordered" role="button" tabindex="0" onclick="openServiceInfo('Acta de nacimiento')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openServiceInfo('Acta de nacimiento')}">
+                        <i class="bi bi-file-earmark-text" style="font-size: 40px;"></i>
+                        <div class="fw-bold mt-2" style="font-size: 14px;">Actas de<br>nacimiento</div>
+                    </div>
+                </div>
+                <!-- Programas sociales -->
+                <div class="col-6">
+                    <div class="service-card bg-light-grey text-dark bordered" role="button" tabindex="0" onclick="openServiceInfo('Programas sociales')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openServiceInfo('Programas sociales')}">
+                        <i class="bi bi-people-fill" style="font-size: 40px;"></i>
+                        <div class="fw-bold mt-2" style="font-size: 14px;">Programas<br>sociales</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GUÍA RÁPIDA -->
+        <div class="px-4 mb-4">
+            <div class="guide-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h5 class="fw-bold mb-0">Guía rápida</h5>
+                    <i class="bi bi-question-circle text-warning fs-5"></i>
+                </div>
+                <div class="text-muted mb-3" style="font-size: 12px;">Cómo reportar una falla paso a paso</div>
+                
+                <!-- Pasos -->
+                <div class="d-flex align-items-start mb-3">
+                    <div class="step-circle font-space">1</div>
+                    <div class="ms-3 text-muted" style="font-size: 12px; margin-top: 4px;">Toma una foto de la incidencia y guarda la ubicación exacta.</div>
+                </div>
+                <div class="d-flex align-items-start mb-3">
+                    <div class="step-circle font-space">2</div>
+                    <div class="ms-3 text-muted" style="font-size: 12px; margin-top: 4px;">Abre Inicio y selecciona Reportar para guardar un reporte comunitario.</div>
+                </div>
+                <div class="d-flex align-items-start">
+                    <div class="step-circle font-space">3</div>
+                    <div class="ms-3 text-muted" style="font-size: 12px; margin-top: 4px;">Añade detalles y ubicación si quieres; el reporte se guarda en el servidor compartido.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREGUNTAS FRECUENTES -->
+        <div class="px-4 mb-4">
+            <h5 class="fw-bold mb-3">Preguntas Frecuentes</h5>
+            
+            <div class="accordion" id="faqAccordion">
+                <!-- FAQ 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            ¿Cómo recupero mi contraseña de HeroesMX?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            La recuperación automática todavía no está disponible. No compartas tu contraseña; contacta a la persona que administra esta instancia.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            ¿Qué documentos necesito para el Predial?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Los requisitos pueden cambiar según el trámite. Consulta el portal oficial de la Ciudad de México antes de iniciar una solicitud.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            ¿Los trámites tienen costo extra en la app?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            HeroesMX no cobra por mostrar información. El organismo oficial puede aplicar derechos o tarifas propias; verifícalos en su portal.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÓN ASESOR -->
+        <div class="px-4 mb-5 pb-3">
+            <button class="btn btn-teal" onclick="showToast('La asesoría en vivo no está conectada. Consulta el portal oficial.')">
+                <i class="bi bi-chat-left-dots-fill me-2 fs-5"></i>
+                Habla con un asesor
+            </button>
+        </div>
+
+    </div>
+
+    <!-- SnackBar (Toast) -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="actionSnackBar" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="snackBarMessage">Mensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../app.js"></script>
+
+    <div class="modal fade" id="serviceInfoModal" tabindex="-1" aria-labelledby="serviceInfoTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="serviceInfoTitle">Trámite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="serviceInfoDescription"></p>
+                    <p class="small text-muted mb-0">HeroesMX no recibe pagos ni envía solicitudes a la autoridad desde este prototipo.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                    <a class="btn btn-teal" href="https://www.cdmx.gob.mx/" target="_blank" rel="noopener noreferrer">Ir al portal oficial</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toastEl = document.getElementById('actionSnackBar');
+        const snackBarMessage = document.getElementById('snackBarMessage');
+        let snackBarInstance;
+
+        window.showToast = function(message) {
+            snackBarMessage.textContent = message;
+            if (!snackBarInstance) {
+                snackBarInstance = new bootstrap.Toast(toastEl, { delay: 2000 });
+            }
+            snackBarInstance.show();
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.CivicApp.loadDashboard();
+            } catch (error) {
+                window.showToast(error.message);
+            }
+
+            // Lógica para capturar "Enter" en la barra de búsqueda si quisieras usar el _searchController
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim().toLocaleLowerCase('es-MX');
+                document.querySelectorAll('.service-card').forEach(card => {
+                    card.closest('[class*="col-"]').hidden = !card.textContent.toLocaleLowerCase('es-MX').includes(query);
+                });
+            });
+        });
+
+        window.openServiceInfo = function(name) {
+            document.getElementById('serviceInfoTitle').textContent = name;
+            document.getElementById('serviceInfoDescription').textContent = `Consulta requisitos, costos y horarios actualizados de ${name} en el portal oficial de la Ciudad de México.`;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('serviceInfoModal')).show();
+        };
+    </script>
+</body>
+</html>
