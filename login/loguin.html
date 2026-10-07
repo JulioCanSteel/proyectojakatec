@@ -157,6 +157,12 @@
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-outline-teal" onclick="window.location.href='../signup/signup.html'">Crear Cuenta</button>
                 </div>
+
+                <div class="mt-4">
+                    <a class="small text-teal text-decoration-none" href="../admin/index.html">
+                        <i class="bi bi-shield-lock me-1"></i>Acceso para personal administrativo
+                    </a>
+                </div>
                 
             </form>
         </div>
@@ -245,8 +251,10 @@
                     loginSpinner.classList.remove('d-none');
 
                     try {
-                        await window.CivicAuth.login(emailInput.value.trim(), passwordInput.value);
-                        window.location.href = '../feed/index.html';
+                        const user = await window.CivicAuth.login(emailInput.value.trim(), passwordInput.value);
+                        window.location.href = ['admin', 'moderator'].includes(user.role)
+                            ? '../admin/index.html'
+                            : '../feed/index.html';
                     } catch (error) {
                         loginBtn.disabled = false;
                         btnText.textContent = 'Iniciar Sesión';

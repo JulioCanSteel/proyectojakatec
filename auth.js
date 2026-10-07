@@ -48,7 +48,7 @@
     }
 
     async function login(email, password) {
-        await post('/api/auth/login', { email, password });
+        return (await post('/api/auth/login', { email, password })).user;
     }
 
     async function getCurrentUser() {
@@ -72,6 +72,18 @@
 
     async function createPost(title, description, details = {}) {
         return (await post('/api/posts', { title, description, ...details })).post;
+    }
+
+    async function listPostComments(postId) {
+        return (await request(`/api/posts/${encodeURIComponent(postId)}/comments`)).comments;
+    }
+
+    async function createPostComment(postId, content) {
+        return (await post(`/api/posts/${encodeURIComponent(postId)}/comments`, { content })).comment;
+    }
+
+    async function updateProfileAvatar(imageData) {
+        return (await post('/api/profile/avatar', { image_data: imageData })).avatar_url;
     }
 
     async function createAlert(type, position = null) {
@@ -98,15 +110,52 @@
         return post('/api/profile/goal', { daily_goal: dailyGoal });
     }
 
+    async function getAdminOverview() {
+        return request('/api/admin/overview');
+    }
+
+    async function createAdminMission(mission) {
+        return post('/api/admin/missions', mission);
+    }
+
+    async function getAdminUsers() {
+        return (await request('/api/admin/users')).users;
+    }
+
+    async function createAdminUser(user) {
+        return (await post('/api/admin/users', user)).user;
+    }
+
+    async function createAdminPost(payload) {
+        return post('/api/admin/posts', payload);
+    }
+
+    async function deleteResource(path) {
+        return request(path, { method: 'DELETE' });
+    }
+
     window.CivicAuth = { register, login, getCurrentUser, logout };
     window.CivicApi = {
         listPosts,
         createPost,
+        listPostComments,
+        createPostComment,
+        updateProfileAvatar,
         createAlert,
         updateBusinessName,
         getDashboard,
         getMissions,
         completeMission,
-        updateDailyGoal
+        updateDailyGoal,
+        getAdminOverview,
+        createAdminMission,
+        createAdminPost,
+        deleteAdminPost: postId => deleteResource(`/api/admin/posts/${encodeURIComponent(postId)}`),
+        deleteAdminMission: missionId => deleteResource(`/api/admin/missions/${encodeURIComponent(missionId)}`),
+        getAdminUsers,
+        createAdminUser,
+        updateAdminUserRole: (userId, role) => post(`/api/admin/users/${encodeURIComponent(userId)}/role`, { role }),
+        updateAdminUserAvatar: (userId, avatarUrl) => post(`/api/admin/users/${encodeURIComponent(userId)}/avatar`, { avatar_url: avatarUrl }),
+        updateAdminPostStatus: (postId, status) => post(`/api/admin/posts/${encodeURIComponent(postId)}/status`, { status })
     };
 })();

@@ -413,7 +413,8 @@
                     const periodDays = Number(periodSelect.value);
                     const cutoff = Date.now() - periodDays * 86400000;
                     const posts = await window.CivicApi.listPosts();
-                    const reports = posts.filter(report => Number.isFinite(report.latitude)
+                    const reports = posts.filter(report => report.kind === 'report'
+                        && Number.isFinite(report.latitude)
                         && Number.isFinite(report.longitude)
                         && Date.parse(report.created_at) >= cutoff);
                     latestReports = reports;
@@ -524,7 +525,8 @@
                     currentPosition = await getLocation();
                     if (window.centerIncidentMap) window.centerIncidentMap(currentPosition);
                     const posts = await window.CivicApi.listPosts();
-                    const nearby = posts.filter(post => Number.isFinite(post.latitude)
+                    const nearby = posts.filter(post => post.kind === 'report'
+                        && Number.isFinite(post.latitude)
                         && Number.isFinite(post.longitude)
                         && distanceKm(currentPosition, post) <= 1.5);
                     document.getElementById('nearbyCount').textContent = nearby.length;
@@ -1017,6 +1019,7 @@
                     ]);
                     const cutoff = Date.now() - 30 * 86400000;
                     const realReports = posts.filter(report => !report.is_demo
+                        && report.kind === 'report'
                         && Number.isFinite(report.latitude)
                         && Number.isFinite(report.longitude)
                         && Date.parse(report.created_at) >= cutoff);

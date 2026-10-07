@@ -132,7 +132,7 @@
         <div class="px-4 mb-4 mt-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Misiones Diarias</h5>
-                <small class="text-muted" style="font-size: 12px;">Se renuevan a medianoche</small>
+                <small class="text-muted" id="missionRefreshStatus" aria-live="polite" style="font-size: 12px;">Se actualizan automáticamente</small>
             </div>
             
             <div id="dailyMissionsContainer">
@@ -190,6 +190,8 @@
     <script src="../app.js"></script>
 
     <script>
+        let missionSnapshot = '';
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const [dashboard, missions] = await Promise.all([
@@ -200,11 +202,28 @@
                 document.getElementById('weeklyReports').textContent = dashboard.stats.weekly_reports;
                 document.getElementById('weeklyPoints').textContent = dashboard.stats.weekly_points;
                 renderMissions(missions);
+                missionSnapshot = JSON.stringify(missions);
                 renderAchievements(dashboard.achievements);
+                window.setInterval(refreshMissions, 10000);
             } catch (error) {
                 window.CivicApp.showMessage(error.message);
             }
         });
+
+        async function refreshMissions() {
+            if (document.visibilityState !== 'visible') return;
+            try {
+                const missions = await window.CivicApi.getMissions();
+                const snapshot = JSON.stringify(missions);
+                if (snapshot === missionSnapshot) return;
+                renderMissions(missions);
+                missionSnapshot = snapshot;
+                document.getElementById('missionRefreshStatus').textContent = 'Misiones actualizadas';
+            } catch (error) {
+                console.error('No se pudieron actualizar las misiones.', error);
+                document.getElementById('missionRefreshStatus').textContent = 'No se pudieron actualizar las misiones';
+            }
+        }
 
         function renderMissions(missions) {
             const container = document.getElementById('dailyMissionsContainer');

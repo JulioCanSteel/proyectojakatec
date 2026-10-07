@@ -38,11 +38,16 @@
                     <h4 class="mb-0 fw-bold">Inicio</h4>
                 </div>
             </div>
-            <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
-                <span id="headerCoins">0</span>
-                <span class="mx-1">•</span>
-                <span id="headerStreak">0</span>
-                <span class="ms-1">🔥</span>
+            <div class="d-flex align-items-center gap-2">
+                <a class="feed-profile-link" href="../perfil/perfil.html" aria-label="Abrir mi perfil">
+                    <span class="feed-avatar" id="feedHeaderAvatar">U</span>
+                </a>
+                <div class="bg-amber rounded-pill px-3 py-1 d-flex align-items-center font-space fw-bold">
+                    <span id="headerCoins">0</span>
+                    <span class="mx-1">•</span>
+                    <span id="headerStreak">0</span>
+                    <span class="ms-1">🔥</span>
+                </div>
             </div>
         </div>
 
@@ -61,8 +66,14 @@
                     </label>
                 </div>
                 <div class="col-6">
-                    <button type="button" class="action-card justify-content-center border-teal text-teal w-100" style="border-color: var(--primary-teal);" data-bs-toggle="modal" data-bs-target="#reportModal">
-                        <i class="bi bi-plus-circle-fill me-2"></i>
+                    <button type="button" class="action-card justify-content-center border-teal text-teal w-100" style="border-color: var(--primary-teal);" data-new-entry="post">
+                        <i class="bi bi-chat-square-text-fill me-2"></i>
+                        <span class="fw-bold" style="font-size: 14px;">Publicar</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="action-card justify-content-center border-warning text-dark w-100" data-new-entry="report">
+                        <i class="bi bi-geo-alt-fill me-2"></i>
                         <span class="fw-bold" style="font-size: 14px;">Reportar</span>
                     </button>
                 </div>
@@ -92,6 +103,12 @@
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
+        <div class="feed-filter-bar px-4 mb-3" role="group" aria-label="Filtrar contenido">
+            <button class="feed-filter active" type="button" data-feed-filter="all">Todo</button>
+            <button class="feed-filter" type="button" data-feed-filter="post">Publicaciones</button>
+            <button class="feed-filter" type="button" data-feed-filter="report">Reportes</button>
+            <button class="feed-filter" type="button" data-feed-filter="news">Noticias</button>
+        </div>
         
         <div id="communityFeed" aria-live="polite"></div>
 
@@ -102,10 +119,11 @@
             <div class="modal-content">
                 <form id="reportForm">
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="reportModalTitle">Nueva publicación</h5>
+                        <h5 class="modal-title fw-bold" id="reportModalTitle">Crear publicación</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
+                        <input type="hidden" id="entryKind" value="post">
                         <div class="mb-3">
                             <label for="reportCategory" class="form-label">Tipo de incidente</label>
                             <select class="form-select" id="reportCategory" required>
@@ -123,9 +141,15 @@
                             <input class="form-control" id="reportTitle" maxlength="120" required>
                         </div>
                         <div>
-                            <label for="reportDescription" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="reportDescription" rows="4" maxlength="2000" required></textarea>
+                            <label for="reportDescription" class="form-label" id="descriptionLabel">¿Qué está pasando?</label>
+                            <textarea class="form-control" id="reportDescription" rows="4" maxlength="2000" required placeholder="Comparte algo con tu comunidad..."></textarea>
                         </div>
+                        <div class="mt-3">
+                            <label for="entryImage" class="form-label">Agregar foto <span class="text-muted small">(opcional, JPG/PNG/WebP, hasta 5 MB)</span></label>
+                            <input class="form-control" id="entryImage" type="file" accept="image/jpeg,image/png,image/webp">
+                            <img id="entryImagePreview" class="entry-image-preview" alt="Vista previa de la imagen seleccionada" hidden>
+                        </div>
+                        <div class="entry-report-fields">
                         <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mt-3">
                             <div class="d-flex gap-2 flex-wrap">
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="reportLocationButton"><i class="bi bi-geo-alt me-1"></i>Usar mi ubicación</button>
@@ -137,7 +161,8 @@
                             <input class="form-check-input" type="checkbox" id="anonymousReport">
                             <label class="form-check-label" for="anonymousReport">Publicar como anónimo</label>
                         </div>
-                        <p class="small text-muted mt-3 mb-0">Se guardará en el equipo que aloja la aplicación. No se envía a C5 ni al 911.</p>
+                        <p class="small text-muted mt-3 mb-0">El reporte queda en la app para seguimiento comunitario. No se envía a C5 ni al 911.</p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
@@ -188,6 +213,8 @@
         let mapPicker = null;
         let locationMarker = null;
         let pendingMapLocation = null;
+        let feedUser = null;
+        let selectedFeedFilter = 'all';
 
         function updateLocationStatus(label = 'Ubicación no compartida', location = null) {
             const statusElement = document.getElementById('reportLocationStatus');
@@ -259,9 +286,60 @@
             modal.show();
         }
 
+        function updateEntryKind(kind) {
+            const isReport = kind === 'report';
+            document.getElementById('entryKind').value = kind;
+            document.getElementById('reportModalTitle').textContent = isReport ? 'Crear reporte comunitario' : 'Crear publicación';
+            document.getElementById('reportTitle').required = isReport;
+            document.getElementById('reportTitle').closest('.mb-3').hidden = !isReport;
+            document.getElementById('reportCategory').required = isReport;
+            document.getElementById('reportCategory').closest('.mb-3').hidden = !isReport;
+            document.querySelector('.entry-report-fields').hidden = !isReport;
+            document.getElementById('descriptionLabel').textContent = isReport ? 'Describe el incidente' : '¿Qué está pasando?';
+            document.getElementById('reportDescription').placeholder = isReport
+                ? 'Comparte los detalles relevantes para tu comunidad...'
+                : 'Comparte algo con tu comunidad...';
+            document.getElementById('publishButton').textContent = isReport ? 'Publicar reporte' : 'Publicar';
+        }
+
+        function readImageFile(file) {
+            const supportedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!supportedTypes.includes(file.type)) {
+                throw new Error('Selecciona una imagen JPG, PNG o WebP.');
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error('La imagen debe pesar 5 MB o menos.');
+            }
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.addEventListener('load', () => resolve(reader.result));
+                reader.addEventListener('error', () => reject(new Error('No se pudo leer la imagen seleccionada.')));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function setAvatar(container, user, className = 'feed-avatar') {
+            container.className = className;
+            container.replaceChildren();
+            const initial = (user?.name || 'Usuario').trim().slice(0, 1).toLocaleUpperCase('es-MX');
+            if (typeof user?.avatar_url === 'string' && user.avatar_url.startsWith('/uploads/')) {
+                const image = document.createElement('img');
+                image.src = user.avatar_url;
+                image.alt = `Foto de perfil de ${user.name}`;
+                image.addEventListener('error', () => {
+                    container.textContent = initial;
+                }, { once: true });
+                container.append(image);
+            } else {
+                container.textContent = initial;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await window.CivicApp.loadDashboard();
+                feedUser = await window.CivicAuth.getCurrentUser();
+                setAvatar(document.getElementById('feedHeaderAvatar'), feedUser);
             } catch (error) {
                 window.showToast(error.message);
             }
@@ -270,7 +348,46 @@
             document.getElementById('refreshNewsButton').addEventListener('click', loadNews);
             window.setInterval(loadNews, 300000);
             loadReports();
+            window.setInterval(() => {
+                if (document.visibilityState === 'visible') loadReports();
+            }, 30000);
             document.getElementById('reportSearch').addEventListener('input', filterFeed);
+            document.querySelectorAll('[data-new-entry]').forEach(button => {
+                button.addEventListener('click', () => {
+                    updateEntryKind(button.dataset.newEntry);
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('reportModal')).show();
+                });
+            });
+            document.getElementById('reportModal').addEventListener('show.bs.modal', () => {
+                updateEntryKind(document.getElementById('entryKind').value || 'post');
+            });
+            document.querySelectorAll('[data-feed-filter]').forEach(button => {
+                button.addEventListener('click', () => {
+                    selectedFeedFilter = button.dataset.feedFilter;
+                    document.querySelectorAll('[data-feed-filter]').forEach(filterButton => {
+                        filterButton.classList.toggle('active', filterButton === button);
+                    });
+                    filterFeed();
+                });
+            });
+            document.getElementById('entryImage').addEventListener('change', async event => {
+                const input = event.currentTarget;
+                const file = input.files[0];
+                const preview = document.getElementById('entryImagePreview');
+                if (!file) {
+                    preview.hidden = true;
+                    preview.removeAttribute('src');
+                    return;
+                }
+                try {
+                    preview.src = await readImageFile(file);
+                    preview.hidden = false;
+                } catch (error) {
+                    input.value = '';
+                    preview.hidden = true;
+                    window.showToast(error.message);
+                }
+            });
 
             document.getElementById('reportLocationButton').addEventListener('click', () => {
                 const status = document.getElementById('reportLocationStatus');
@@ -319,6 +436,7 @@
                 const publishButton = document.getElementById('publishButton');
                 publishButton.disabled = true;
                 try {
+                    const kind = document.getElementById('entryKind').value;
                     if (reportLocation && (
                         !Number.isFinite(reportLocation.latitude)
                         || !Number.isFinite(reportLocation.longitude)
@@ -330,22 +448,32 @@
                         throw new Error('La ubicación seleccionada no es válida. Vuelve a elegir el punto en el mapa.');
                     }
 
+                    const description = document.getElementById('reportDescription').value.trim();
+                    const imageFile = document.getElementById('entryImage').files[0];
+                    const imageData = imageFile ? await readImageFile(imageFile) : '';
                     await window.CivicApi.createPost(
-                        document.getElementById('reportTitle').value.trim(),
-                        document.getElementById('reportDescription').value.trim(),
+                        kind === 'report'
+                            ? document.getElementById('reportTitle').value.trim()
+                            : description.slice(0, 120) || 'Publicación de la comunidad',
+                        description,
                         {
-                            category: document.getElementById('reportCategory').value,
-                            latitude: reportLocation?.latitude ?? null,
-                            longitude: reportLocation?.longitude ?? null,
-                            anonymous: document.getElementById('anonymousReport').checked
+                            kind,
+                            category: kind === 'report' ? document.getElementById('reportCategory').value : 'General',
+                            latitude: kind === 'report' ? reportLocation?.latitude ?? null : null,
+                            longitude: kind === 'report' ? reportLocation?.longitude ?? null : null,
+                            anonymous: kind === 'report' && document.getElementById('anonymousReport').checked,
+                            image_data: imageData
                         }
                     );
                     form.reset();
+                    updateEntryKind('post');
+                    document.getElementById('entryImagePreview').hidden = true;
+                    document.getElementById('entryImagePreview').removeAttribute('src');
                     reportLocation = null;
                     pendingMapLocation = null;
                     updateLocationStatus();
                     bootstrap.Modal.getOrCreateInstance(document.getElementById('reportModal')).hide();
-                    showToast('Publicación guardada en el equipo anfitrión.');
+                    showToast(kind === 'report' ? 'Reporte publicado para seguimiento comunitario.' : 'Publicación compartida con la comunidad.');
                     await loadReports();
                 } catch (error) {
                     showToast(error.message);
@@ -357,7 +485,7 @@
 
         let newsLoading = false;
         let feedNews = [];
-        let feedReports = [];
+        let feedPosts = [];
 
         async function loadNews() {
             if (newsLoading) return;
@@ -397,6 +525,7 @@
         function createNewsCard(article) {
             const card = document.createElement('article');
             card.className = 'news-card feed-item';
+            card.dataset.kind = 'news';
 
             const meta = document.createElement('div');
             meta.className = 'd-flex justify-content-between align-items-start gap-2 mb-2';
@@ -451,24 +580,25 @@
         function renderCommunityFeed() {
             const container = document.getElementById('communityFeed');
             const fragment = document.createDocumentFragment();
-            let reportIndex = 0;
-            let newsIndex = 0;
+            const items = [
+                ...feedPosts.map(post => ({ type: 'community', date: post.created_at, post })),
+                ...feedNews.map(article => ({ type: 'news', date: article.published_at, article }))
+            ].sort((first, second) => {
+                const firstTime = new Date(first.date).getTime();
+                const secondTime = new Date(second.date).getTime();
+                return (Number.isNaN(secondTime) ? 0 : secondTime) - (Number.isNaN(firstTime) ? 0 : firstTime);
+            });
 
-            while (reportIndex < feedReports.length || newsIndex < feedNews.length) {
-                if (reportIndex < feedReports.length) {
-                    fragment.append(createReportCard(feedReports[reportIndex]));
-                    reportIndex += 1;
-                }
-                if (newsIndex < feedNews.length) {
-                    fragment.append(createNewsCard(feedNews[newsIndex]));
-                    newsIndex += 1;
-                }
+            for (const item of items) {
+                fragment.append(item.type === 'news'
+                    ? createNewsCard(item.article)
+                    : createCommunityCard(item.post));
             }
 
-            if (reportIndex === 0 && newsIndex === 0) {
+            if (!items.length) {
                 const emptyState = document.createElement('p');
                 emptyState.className = 'px-4 text-muted small';
-                emptyState.textContent = 'Todavía no hay publicaciones ni noticias disponibles.';
+                emptyState.textContent = 'Todavía no hay contenido. ¡Comparte la primera publicación!';
                 fragment.append(emptyState);
             }
 
@@ -478,64 +608,225 @@
 
         async function loadReports() {
             try {
-                feedReports = await window.CivicApi.listPosts();
+                feedPosts = await window.CivicApi.listPosts();
                 renderCommunityFeed();
             } catch (error) {
-                showToast(error.message || 'No se pudieron cargar las publicaciones.');
+                showToast(error.message || 'No se pudo cargar el contenido de la comunidad.');
             }
         }
 
         function filterFeed() {
             const query = document.getElementById('reportSearch').value.trim().toLocaleLowerCase('es-MX');
             document.querySelectorAll('#communityFeed .feed-item').forEach(card => {
-                card.hidden = !card.textContent.toLocaleLowerCase('es-MX').includes(query);
+                const matchesQuery = card.textContent.toLocaleLowerCase('es-MX').includes(query);
+                const matchesFilter = selectedFeedFilter === 'all'
+                    || card.dataset.kind === selectedFeedFilter;
+                card.hidden = !matchesQuery || !matchesFilter;
             });
         }
 
-        function createReportCard(report) {
+        function createCommunityCard(report) {
             const card = document.createElement('article');
             card.className = 'report-card feed-item';
+            card.id = `post-${report.id}`;
+            card.dataset.kind = report.kind || 'report';
 
             const header = document.createElement('div');
-            header.className = 'd-flex justify-content-between align-items-center mb-3';
+            header.className = 'community-post-header';
             const authorGroup = document.createElement('div');
-            authorGroup.className = 'd-flex align-items-center';
+            authorGroup.className = 'community-author';
             const avatar = document.createElement('div');
-            avatar.className = 'report-avatar';
-            avatar.innerHTML = '<i class="bi bi-person-fill fs-5"></i>';
+            setAvatar(avatar, { name: report.author, avatar_url: report.avatar_url }, 'report-avatar');
             const authorDetails = document.createElement('div');
             authorDetails.className = 'ms-2';
             const author = document.createElement('div');
-            author.className = 'fw-bold';
-            author.style.fontSize = '13px';
+            author.className = 'community-author-name';
             author.textContent = report.author;
             const time = document.createElement('div');
-            time.className = 'text-muted';
-            time.style.fontSize = '11px';
-            time.textContent = new Date(report.created_at).toLocaleString('es-MX');
+            time.className = 'community-post-time';
+            time.textContent = formatNewsDate(report.created_at);
             authorDetails.append(author, time);
             authorGroup.append(avatar, authorDetails);
 
-            const status = document.createElement('div');
-            status.className = `report-status ${report.is_demo ? 'status-demo' : report.status === 'Atendido' ? 'status-resolved' : 'status-pending'}`;
-            status.textContent = report.is_demo ? 'DEMO' : report.status;
-            const category = document.createElement('span');
-            category.className = 'small text-secondary text-center';
-            category.textContent = report.category || 'General';
-            header.append(authorGroup, category, status);
+            const type = document.createElement('span');
+            type.className = `community-type ${report.kind === 'report' ? 'community-type-report' : 'community-type-post'}`;
+            type.textContent = report.is_demo ? 'DEMO' : report.kind === 'report' ? 'Reporte comunitario' : 'Publicación';
+            header.append(authorGroup, type);
 
-            const title = document.createElement('h6');
-            title.className = 'fw-bold mb-1';
-            title.style.fontSize = '15px';
-            title.textContent = report.title;
+            if (report.kind === 'report' && report.title) {
+                const title = document.createElement('h6');
+                title.className = 'fw-bold mb-2';
+                title.textContent = report.title;
+                card.append(header, title);
+            } else {
+                card.append(header);
+            }
             const description = document.createElement('p');
-            description.className = 'text-muted mb-0';
-            description.style.fontSize = '13px';
+            description.className = 'community-post-content';
             description.textContent = report.description;
+            card.append(description);
 
-            card.append(header, title, description);
+            if (report.kind === 'report') {
+                const details = document.createElement('div');
+                details.className = 'community-report-details';
+                const category = document.createElement('span');
+                category.textContent = report.category || 'General';
+                const status = document.createElement('span');
+                status.className = `report-status ${report.is_demo ? 'status-demo' : report.status === 'Atendido' ? 'status-resolved' : 'status-pending'}`;
+                status.textContent = report.is_demo ? 'DEMO' : report.status || 'Pendiente';
+                details.append(category, status);
+                card.append(details);
+            }
+            if (typeof report.image_url === 'string'
+                && (report.image_url.startsWith('/uploads/') || report.image_url.startsWith('https://'))) {
+                const image = document.createElement('img');
+                image.className = 'community-post-image';
+                image.src = report.image_url;
+                image.alt = report.kind === 'report' ? 'Foto adjunta al reporte' : 'Foto de la publicación';
+                image.loading = 'lazy';
+                card.append(image);
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'community-post-actions';
+            const commentButton = document.createElement('button');
+            commentButton.type = 'button';
+            commentButton.className = 'action-btn';
+            commentButton.dataset.toggleComments = report.id;
+            commentButton.disabled = Boolean(report.is_demo);
+            commentButton.innerHTML = `<i class="bi bi-chat"></i><span>Comentar</span><span class="comment-count">${Number(report.comment_count) || 0}</span>`;
+            const shareButton = document.createElement('button');
+            shareButton.type = 'button';
+            shareButton.className = 'action-btn';
+            shareButton.dataset.sharePost = report.id;
+            shareButton.innerHTML = '<i class="bi bi-share"></i><span>Compartir</span>';
+            actions.append(commentButton, shareButton);
+            card.append(actions);
+
+            const commentsPanel = document.createElement('section');
+            commentsPanel.className = 'post-comments';
+            commentsPanel.dataset.commentsPanel = report.id;
+            commentsPanel.hidden = true;
+            const commentsList = document.createElement('div');
+            commentsList.className = 'post-comments-list';
+            const commentForm = document.createElement('form');
+            commentForm.className = 'post-comment-form';
+            commentForm.dataset.commentForm = report.id;
+            const commentInput = document.createElement('input');
+            commentInput.className = 'form-control form-control-sm';
+            commentInput.name = 'content';
+            commentInput.maxLength = 1000;
+            commentInput.placeholder = 'Escribe un comentario...';
+            commentInput.setAttribute('aria-label', 'Escribe un comentario');
+            commentInput.required = true;
+            const sendComment = document.createElement('button');
+            sendComment.className = 'btn btn-sm btn-success';
+            sendComment.type = 'submit';
+            sendComment.textContent = 'Enviar';
+            commentForm.append(commentInput, sendComment);
+            commentsPanel.append(commentsList, commentForm);
+            card.append(commentsPanel);
             return card;
         }
+
+        function renderComments(target, comments) {
+            target.replaceChildren();
+            if (!comments.length) {
+                const empty = document.createElement('p');
+                empty.className = 'small text-muted mb-2';
+                empty.textContent = 'Aún no hay comentarios.';
+                target.append(empty);
+                return;
+            }
+            comments.forEach(comment => {
+                const row = document.createElement('div');
+                row.className = 'post-comment';
+                const avatar = document.createElement('div');
+                setAvatar(avatar, { name: comment.author, avatar_url: comment.avatar_url }, 'comment-avatar');
+                const content = document.createElement('div');
+                content.className = 'post-comment-content';
+                const author = document.createElement('strong');
+                author.textContent = comment.author;
+                const text = document.createElement('p');
+                text.textContent = comment.content;
+                content.append(author, text);
+                row.append(avatar, content);
+                target.append(row);
+            });
+        }
+
+        document.getElementById('communityFeed').addEventListener('click', async event => {
+            const commentButton = event.target.closest('[data-toggle-comments]');
+            if (commentButton && !commentButton.disabled) {
+                const panel = commentButton.closest('.report-card').querySelector('.post-comments');
+                panel.hidden = !panel.hidden;
+                if (!panel.hidden && panel.dataset.loaded !== 'true') {
+                    try {
+                        const comments = await window.CivicApi.listPostComments(commentButton.dataset.toggleComments);
+                        renderComments(panel.querySelector('.post-comments-list'), comments);
+                        panel.dataset.loaded = 'true';
+                    } catch (error) {
+                        window.showToast(error.message || 'No se pudieron cargar los comentarios.');
+                    }
+                }
+                return;
+            }
+            const shareButton = event.target.closest('[data-share-post]');
+            if (!shareButton) return;
+            const post = feedPosts.find(item => String(item.id) === String(shareButton.dataset.sharePost));
+            const url = new URL(`/feed/index.html#post-${encodeURIComponent(shareButton.dataset.sharePost)}`, window.location.origin).href;
+            try {
+                if (navigator.share) {
+                    await navigator.share({ title: post?.title || 'HeroesMX', text: post?.description || '', url });
+                    return;
+                }
+                if (!navigator.clipboard?.writeText) {
+                    throw new Error('Tu navegador no permite compartir ni copiar enlaces.');
+                }
+                await navigator.clipboard.writeText(url);
+                window.showToast('Enlace copiado para compartir.');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    window.showToast(error.message || 'No se pudo compartir esta publicación.');
+                }
+            }
+        });
+
+        document.getElementById('communityFeed').addEventListener('submit', async event => {
+            const form = event.target.closest('[data-comment-form]');
+            if (!form) return;
+            event.preventDefault();
+            const submitButton = form.querySelector('button[type="submit"]');
+            const input = form.elements.content;
+            submitButton.disabled = true;
+            try {
+                const comment = await window.CivicApi.createPostComment(form.dataset.commentForm, input.value.trim());
+                const panel = form.closest('.post-comments');
+                const list = panel.querySelector('.post-comments-list');
+                if (!panel.dataset.loaded || list.querySelector('.text-muted')) list.replaceChildren();
+                panel.dataset.loaded = 'true';
+                const row = document.createElement('div');
+                row.className = 'post-comment';
+                const avatar = document.createElement('div');
+                setAvatar(avatar, { name: comment.author, avatar_url: comment.avatar_url }, 'comment-avatar');
+                const content = document.createElement('div');
+                content.className = 'post-comment-content';
+                const author = document.createElement('strong');
+                author.textContent = comment.author;
+                const text = document.createElement('p');
+                text.textContent = comment.content;
+                content.append(author, text);
+                row.append(avatar, content);
+                list.append(row);
+                const count = form.closest('.report-card').querySelector('.comment-count');
+                count.textContent = Number(count.textContent) + 1;
+                input.value = '';
+            } catch (error) {
+                window.showToast(error.message || 'No se pudo publicar el comentario.');
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
 
         // Utilidad global para los Toast (SnackBar)
         const toastEl = document.getElementById('actionSnackBar');

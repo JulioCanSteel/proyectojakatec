@@ -153,3 +153,75 @@
             align-items: center;
             gap: 6px;
         }
+
+        .feed-profile-link { display: inline-flex; text-decoration: none; }
+        .feed-avatar, .report-avatar, .comment-avatar {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 50%;
+            background: #e8f3f3;
+            color: var(--primary-teal);
+            font-weight: 700;
+        }
+        .feed-avatar { width: 38px; height: 38px; }
+        .report-avatar { width: 42px; height: 42px; }
+        .comment-avatar { width: 30px; height: 30px; font-size: 12px; }
+        .feed-avatar img, .report-avatar img, .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .feed-filter-bar { display: flex; gap: 8px; overflow-x: auto; }
+        .feed-filter {
+            flex: 0 0 auto;
+            border: 1px solid var(--medium-grey);
+            border-radius: 999px;
+            padding: 7px 13px;
+            background: #fff;
+            color: var(--dark-grey);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .feed-filter.active { border-color: var(--primary-teal); background: #e8f3f3; color: var(--primary-teal); }
+        .entry-report-fields[hidden] { display: none !important; }
+        .entry-image-preview {
+            display: block;
+            max-width: 100%;
+            max-height: 260px;
+            margin-top: 12px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+        .community-post-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+        .community-author { display: flex; align-items: center; min-width: 0; }
+        .community-author-name { color: #202a33; font-size: 13px; font-weight: 700; }
+        .community-post-time { color: #87919a; font-size: 11px; }
+        .community-type {
+            flex: 0 0 auto;
+            border-radius: 999px;
+            padding: 4px 9px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .community-type-post { color: #006d63; background: #e7f5f2; }
+        .community-type-report { color: #8b5b00; background: #fff5d8; }
+        .community-post-content { margin: 0 0 12px; color: #28333c; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+        .community-report-details { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 10px 0; color: #68757e; font-size: 12px; }
+        .community-post-image { display: block; width: 100%; max-height: 520px; margin: 12px 0; border-radius: 12px; background: #f2f4f5; object-fit: contain; }
+        .community-post-actions { display: flex; justify-content: space-around; gap: 8px; border-top: 1px solid var(--medium-grey); margin-top: 12px; padding-top: 10px; }
+        .community-post-actions .action-btn { justify-content: center; width: 50%; min-height: 38px; border-radius: 8px; }
+        .community-post-actions .action-btn:hover:not(:disabled) { background: var(--light-grey); color: var(--primary-teal); }
+        .community-post-actions .action-btn:disabled { opacity: .5; }
+        .comment-count { color: #87919a; }
+        .post-comments { border-top: 1px solid var(--medium-grey); padding-top: 10px; }
+        .post-comments-list { display: grid; gap: 9px; margin-bottom: 10px; }
+        .post-comment { display: flex; align-items: flex-start; gap: 8px; }
+        .post-comment-content { min-width: 0; border-radius: 12px; padding: 7px 10px; background: var(--light-grey); font-size: 11px; overflow-wrap: anywhere; }
+        .post-comment-content strong { display: block; margin-bottom: 2px; color: #38434b; }
+        .post-comment-content p { margin: 0; color: #52606a; white-space: pre-wrap; }
+        .post-comment-form { display: flex; gap: 8px; }
+        .post-comment-form .form-control { min-width: 0; border-radius: 999px; }
+        .post-comment-form .btn { flex: 0 0 auto; border-radius: 999px; }

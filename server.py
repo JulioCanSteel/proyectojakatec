@@ -10,6 +10,8 @@ import secrets
 import sqlite3
 import threading
 import time
+import base64
+import binascii
 import email.utils
 import urllib.error
 import urllib.parse
@@ -81,7 +83,8 @@ DEMO_REPORTS = (
     ("oaxaca_vandalismo", "DEMO · Vandalismo", "Punto de muestra en Oaxaca; no representa un incidente real.", "Vandalismo", 17.0732, -96.7266, 5),
     ("tijuana_robo", "DEMO · Reporte comunitario", "Punto de muestra en Tijuana; no representa un incidente real.", "Robo / asalto", 32.5149, -117.0382, 6),
 )
-        <!-- Community feed -->
+
+#feed de comunidad
 
 @contextmanager
 def database():
@@ -109,6 +112,8 @@ def initialize_database() -> None:
                 email TEXT NOT NULL UNIQUE COLLATE NOCASE,
                 business_name TEXT NOT NULL DEFAULT '',
                 daily_goal INTEGER NOT NULL DEFAULT 30,
+                role TEXT NOT NULL DEFAULT 'user',
+                avatar_url TEXT NOT NULL DEFAULT '',
                 password_salt BLOB NOT NULL,
                 password_hash BLOB NOT NULL,
                 created_at TEXT NOT NULL
@@ -123,13 +128,23 @@ def initialize_database() -> None:
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                 title TEXT NOT NULL,
                 description TEXT NOT NULL,
+                kind TEXT NOT NULL DEFAULT 'report',
                 category TEXT NOT NULL DEFAULT 'General',
                 latitude REAL,
                 longitude REAL,
                 anonymous INTEGER NOT NULL DEFAULT 0,
                 status TEXT NOT NULL DEFAULT 'Pendiente',
+                image_url TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS post_comments (
+                id INTEGER PRIMARY KEY,
+                post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS post_comments_post_id ON post_comments(post_id, created_at);
             CREATE TABLE IF NOT EXISTS demo_reports (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -157,6 +172,16 @@ def initialize_database() -> None:
                 created_at TEXT NOT NULL,
                 UNIQUE(user_id, event_key)
             );
+            CREATE TABLE IF NOT EXISTS missions (
+                id INTEGER PRIMARY KEY,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                icon TEXT NOT NULL DEFAULT 'bi-flag-fill',
+                points INTEGER NOT NULL DEFAULT 0,
+                coins INTEGER NOT NULL DEFAULT 0,
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL
+            );
             """
         )
         user_columns = {row["name"] for row in connection.execute("PRAGMA table_info(users)")}
@@ -164,15 +189,32 @@ def initialize_database() -> None:
             connection.execute("ALTER TABLE users ADD COLUMN business_name TEXT NOT NULL DEFAULT ''")
         if "daily_goal" not in user_columns:
             connection.execute("ALTER TABLE users ADD COLUMN daily_goal INTEGER NOT NULL DEFAULT 30")
+        if "role" not in user_columns:
+            connection.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
+        if "avatar_url" not in user_columns:
+            connection.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT NOT NULL DEFAULT ''")
         post_columns = {row["name"] for row in connection.execute("PRAGMA table_info(posts)")}
         for column, definition in (
+            ("kind", "TEXT NOT NULL DEFAULT 'report'"),
             ("category", "TEXT NOT NULL DEFAULT 'General'"),
             ("latitude", "REAL"),
             ("longitude", "REAL"),
             ("anonymous", "INTEGER NOT NULL DEFAULT 0"),
+            ("image_url", "TEXT NOT NULL DEFAULT ''"),
         ):
             if column not in post_columns:
                 connection.execute(f"ALTER TABLE posts ADD COLUMN {column} {definition}")
+        admin_emails = {
+            email.strip().lower()
+            for email in os.environ.get("HEROESMX_ADMIN_EMAILS", "").split(",")
+            if email.strip()
+        }
+        if admin_emails:
+            placeholders = ",".join("?" for _ in admin_emails)
+            connection.execute(
+                f"UPDATE users SET role = 'admin' WHERE lower(email) IN ({placeholders}) AND role != 'admin'",
+                tuple(sorted(admin_emails)),
+            )
         if os.environ.get("HEROESMX_DEMO_DATA") == "1":
             for demo_id, title, description, category, latitude, longitude, age_days in DEMO_REPORTS:
                 created_at = (now_utc() - timedelta(days=age_days)).isoformat(timespec="seconds")
@@ -270,7 +312,9 @@ class CivicMxHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         path = urlsplit(self.path).path
-            document.getElementById('reportSearch').addEventListener('input', filterFeed);
+
+        # Si entran a la raíz '/', redirigir a login
+        if path == "/":
             self.send_response(302)
             self.send_header("Location", "/login/loguin.html")
             self.send_header("Content-Length", "0")
@@ -301,6 +345,14 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                 self.send_json({"missions": self.get_missions(user)})
             return
 
+        if path == "/api/admin/overview":
+            self.admin_overview()
+            return
+
+        if path == "/api/admin/users":
+            self.admin_users()
+            return
+
         if path == "/api/news":
             try:
                 self.send_json(get_mexico_news())
@@ -318,18 +370,25 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                   """SELECT * FROM (
                       SELECT posts.id,
                           CASE WHEN posts.anonymous = 1 THEN 'Anónimo' ELSE users.name END AS author,
-                          posts.title, posts.description, posts.category,
+                          CASE WHEN posts.anonymous = 1 THEN '' ELSE users.avatar_url END AS avatar_url,
+                          posts.title, posts.description, posts.kind, posts.category,
                           posts.latitude, posts.longitude, posts.anonymous,
-                          posts.status, posts.created_at, 0 AS is_demo
+                          posts.status, posts.image_url, posts.created_at, 0 AS is_demo,
+                          (SELECT COUNT(*) FROM post_comments WHERE post_id = posts.id) AS comment_count
                       FROM posts JOIN users ON users.id = posts.user_id
                       UNION ALL
-                      SELECT 'demo-' || id AS id, 'DEMO' AS author, title, description, category,
+                      SELECT 'demo-' || id AS id, 'DEMO' AS author, '' AS avatar_url,
+                          title, description, 'report' AS kind, category,
                           latitude, longitude, 1 AS anonymous, 'Demostración' AS status,
-                          created_at, 1 AS is_demo
+                          '' AS image_url, created_at, 1 AS is_demo, 0 AS comment_count
                       FROM demo_reports
                   ) ORDER BY created_at DESC"""
                 ).fetchall()
             self.send_json({"posts": [dict(row) for row in rows]})
+            return
+
+        if path.startswith("/api/posts/") and path.endswith("/comments"):
+            self.list_post_comments(path.removeprefix("/api/posts/").removesuffix("/comments").strip("/"))
             return
 
         self.serve_static(path)
@@ -345,6 +404,10 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                 self.logout()
             elif path == "/api/posts":
                 self.create_post()
+            elif path.startswith("/api/posts/") and path.endswith("/comments"):
+                self.create_post_comment(path.removeprefix("/api/posts/").removesuffix("/comments").strip("/"))
+            elif path == "/api/profile/avatar":
+                self.update_profile_avatar()
             elif path == "/api/alerts":
                 self.create_alert()
             elif path == "/api/profile/business":
@@ -353,12 +416,36 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                 self.update_daily_goal()
             elif path == "/api/missions/complete":
                 self.complete_mission()
+            elif path == "/api/admin/missions":
+                self.create_admin_mission()
+            elif path == "/api/admin/posts":
+                self.create_admin_post()
+            elif path == "/api/admin/users":
+                self.create_admin_user()
+            elif path.startswith("/api/admin/posts/") and path.endswith("/status"):
+                self.update_admin_post_status(path.removeprefix("/api/admin/posts/").removesuffix("/status").strip("/"))
+            elif path.startswith("/api/admin/users/") and path.endswith("/role"):
+                self.update_admin_user(path.removeprefix("/api/admin/users/").removesuffix("/role").strip("/"), "role")
+            elif path.startswith("/api/admin/users/") and path.endswith("/avatar"):
+                self.update_admin_user(path.removeprefix("/api/admin/users/").removesuffix("/avatar").strip("/"), "avatar")
             else:
                 self.send_json({"error": "No se encontró esa ruta."}, 404)
-        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError, binascii.Error) as error:
             self.send_json({"error": str(error) or "Solicitud no válida."}, 400)
         except sqlite3.IntegrityError:
             self.send_json({"error": "Ya existe una cuenta con ese correo."}, 409)
+        except OSError as error:
+            print(f"No se pudo guardar un archivo de la solicitud: {error}")
+            self.send_json({"error": "No se pudo guardar la imagen en el servidor."}, 500)
+
+    def do_DELETE(self) -> None:
+        path = urlsplit(self.path).path
+        if path.startswith("/api/admin/posts/"):
+            self.delete_admin_post(path.removeprefix("/api/admin/posts/"))
+        elif path.startswith("/api/admin/missions/"):
+            self.delete_admin_mission(path.removeprefix("/api/admin/missions/"))
+        else:
+            self.send_json({"error": "No se encontró esa ruta."}, 404)
 
     def register(self) -> None:
         data = self.read_json()
@@ -390,7 +477,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
             self.store_session(connection, token, user_id)
 
         self.send_json(
-            {"user": {"id": user_id, "name": name, "email": email}},
+            {"user": {"id": user_id, "name": name, "email": email, "role": "user", "avatar_url": ""}},
             201,
             [("Set-Cookie", self.session_cookie(token))],
         )
@@ -402,7 +489,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
 
         with database() as connection:
             row = connection.execute(
-                "SELECT id, name, email, password_salt, password_hash FROM users WHERE email = ?",
+                "SELECT id, name, email, role, avatar_url, password_salt, password_hash FROM users WHERE email = ?",
                 (email,),
             ).fetchone()
 
@@ -418,7 +505,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
             self.record_event(connection, row["id"], f"mission:daily_login:{today}", today, 5, 5)
 
         self.send_json(
-            {"user": {"id": row["id"], "name": row["name"], "email": row["email"]}},
+            {"user": {"id": row["id"], "name": row["name"], "email": row["email"], "role": row["role"], "avatar_url": row["avatar_url"]}},
             headers=[("Set-Cookie", self.session_cookie(token))],
         )
 
@@ -439,10 +526,35 @@ class CivicMxHandler(BaseHTTPRequestHandler):
             self.send_json({"error": "Inicia sesión para publicar."}, 401)
             return
 
-        data = self.read_json()
+        data = self.read_json(max_bytes=7_200_000)
+        kind = data.get("kind", "report")
+        if kind not in {"post", "report"}:
+            raise ValueError("Selecciona una publicación o un reporte válido.")
+        status = "Publicado" if kind == "post" else "Pendiente"
+        self.insert_post(user, data, status, award_points=True, kind=kind)
+
+    def create_admin_post(self) -> None:
+        user = self.require_admin()
+        if user is None:
+            return
+        data = self.read_json(max_bytes=7_200_000)
+        data["anonymous"] = False
+        data["kind"] = "post"
+        self.insert_post(user, data, "Publicado", award_points=False, kind="post")
+
+    def insert_post(
+        self,
+        user: dict,
+        data: dict,
+        status: str,
+        award_points: bool,
+        kind: str = "report",
+    ) -> None:
         title = self.text_field(data, "title", "El título es obligatorio.").strip()
         description = self.text_field(data, "description", "La descripción es obligatoria.").strip()
         category = self.text_field(data, "category", "El tipo de incidente no es válido.").strip()
+        if kind not in {"post", "report"}:
+            raise ValueError("Selecciona una publicación o un reporte válido.")
         anonymous = data.get("anonymous", False)
         if not isinstance(anonymous, bool):
             raise ValueError("La opción de anonimato no es válida.")
@@ -456,19 +568,26 @@ class CivicMxHandler(BaseHTTPRequestHandler):
         longitude = self.optional_coordinate(data.get("longitude"), -180, 180)
         if (latitude is None) != (longitude is None):
             raise ValueError("La ubicación está incompleta.")
+        if kind == "post" and (latitude is not None or anonymous):
+            raise ValueError("Las publicaciones no admiten ubicación ni anonimato.")
+        image_url = self.store_image(data.get("image_data", ""))
 
         created_at = now_utc().isoformat(timespec="seconds")
         with database() as connection:
             cursor = connection.execute(
                 """INSERT INTO posts (
-                       user_id, title, description, category, latitude, longitude, anonymous, created_at
-                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (user["id"], title, description, category, latitude, longitude, int(anonymous), created_at),
+                       user_id, title, description, kind, category, latitude, longitude,
+                       anonymous, status, image_url, created_at
+                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (user["id"], title, description, kind, category, latitude, longitude,
+                 int(anonymous), status, image_url, created_at),
             )
             post_id = cursor.lastrowid
-            today = self.today_date()
-            self.record_event(connection, user["id"], f"post:{post_id}", today, 15, 15)
-            self.record_event(connection, user["id"], f"mission:report_incident:{today}", today, 20, 20)
+            if award_points:
+                today = self.today_date()
+                self.record_event(connection, user["id"], f"post:{post_id}", today, 15, 15)
+                if kind == "report":
+                    self.record_event(connection, user["id"], f"mission:report_incident:{today}", today, 20, 20)
 
         self.send_json(
             {
@@ -477,16 +596,109 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                     "author": "Anónimo" if anonymous else user["name"],
                     "title": title,
                     "description": description,
+                    "kind": kind,
                     "category": category,
                     "latitude": latitude,
                     "longitude": longitude,
                     "anonymous": anonymous,
-                    "status": "Pendiente",
+                    "status": status,
+                    "image_url": image_url,
+                    "avatar_url": "" if anonymous else user.get("avatar_url", ""),
+                    "comment_count": 0,
                     "created_at": created_at,
                 }
             },
             201,
         )
+
+    def list_post_comments(self, post_id: str) -> None:
+        if not post_id.isdecimal():
+            self.send_json({"error": "No se encontró esa publicación."}, 404)
+            return
+        with database() as connection:
+            post = connection.execute("SELECT id FROM posts WHERE id = ?", (int(post_id),)).fetchone()
+            if post is None:
+                self.send_json({"error": "No se encontró esa publicación."}, 404)
+                return
+            rows = connection.execute(
+                """SELECT post_comments.id, post_comments.content, post_comments.created_at,
+                          users.name AS author, users.avatar_url
+                   FROM post_comments JOIN users ON users.id = post_comments.user_id
+                   WHERE post_comments.post_id = ? ORDER BY post_comments.created_at ASC""",
+                (int(post_id),),
+            ).fetchall()
+        self.send_json({"comments": [dict(row) for row in rows]})
+
+    def create_post_comment(self, post_id: str) -> None:
+        user = self.current_user()
+        if user is None:
+            self.send_json({"error": "Inicia sesión para comentar."}, 401)
+            return
+        if not post_id.isdecimal():
+            self.send_json({"error": "No se encontró esa publicación."}, 404)
+            return
+        data = self.read_json()
+        content = self.text_field(data, "content", "Escribe un comentario.").strip()
+        if not content or len(content) > 1000:
+            raise ValueError("El comentario debe tener entre 1 y 1000 caracteres.")
+        created_at = now_utc().isoformat(timespec="seconds")
+        with database() as connection:
+            if connection.execute("SELECT id FROM posts WHERE id = ?", (int(post_id),)).fetchone() is None:
+                self.send_json({"error": "No se encontró esa publicación."}, 404)
+                return
+            cursor = connection.execute(
+                """INSERT INTO post_comments (post_id, user_id, content, created_at)
+                   VALUES (?, ?, ?, ?)""",
+                (int(post_id), user["id"], content, created_at),
+            )
+        self.send_json({
+            "comment": {
+                "id": cursor.lastrowid,
+                "content": content,
+                "author": user["name"],
+                "avatar_url": user.get("avatar_url", ""),
+                "created_at": created_at,
+            }
+        }, 201)
+
+    def update_profile_avatar(self) -> None:
+        user = self.current_user()
+        if user is None:
+            self.send_json({"error": "Inicia sesión para actualizar tu foto."}, 401)
+            return
+        data = self.read_json(max_bytes=7_200_000)
+        avatar_url = self.store_image(data.get("image_data", ""))
+        with database() as connection:
+            connection.execute("UPDATE users SET avatar_url = ? WHERE id = ?", (avatar_url, user["id"]))
+        self.send_json({"avatar_url": avatar_url})
+
+    @staticmethod
+    def store_image(image_data: object) -> str:
+        if image_data == "":
+            return ""
+        if not isinstance(image_data, str) or len(image_data) > 7_100_000:
+            raise ValueError("La imagen debe pesar 5 MB o menos.")
+        match = re.fullmatch(r"data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/]+=*)", image_data)
+        if not match:
+            raise ValueError("Usa una imagen JPG, PNG o WebP.")
+        image_bytes = base64.b64decode(match.group(2), validate=True)
+        if not image_bytes or len(image_bytes) > 5 * 1024 * 1024:
+            raise ValueError("La imagen debe pesar 5 MB o menos.")
+        image_type = match.group(1)
+        valid_signature = (
+            image_type == "jpeg" and image_bytes.startswith(b"\xff\xd8\xff")
+            or image_type == "png" and image_bytes.startswith(b"\x89PNG\r\n\x1a\n")
+            or image_type == "webp" and image_bytes.startswith(b"RIFF") and image_bytes[8:12] == b"WEBP"
+        )
+        if not valid_signature:
+            raise ValueError("El contenido no coincide con el formato de imagen.")
+        extension = {"jpeg": ".jpg", "png": ".png", "webp": ".webp"}[image_type]
+        upload_dir = ROOT / "uploads"
+        upload_dir.mkdir(mode=0o750, exist_ok=True)
+        file_name = f"{secrets.token_hex(20)}{extension}"
+        with (upload_dir / file_name).open("xb") as image_file:
+            image_file.write(image_bytes)
+        return f"/uploads/{file_name}"
 
     def create_alert(self) -> None:
         user = self.current_user()
@@ -561,6 +773,24 @@ class CivicMxHandler(BaseHTTPRequestHandler):
         data = self.read_json()
         mission_id = self.text_field(data, "mission_id", "La misión no es válida.")
         mission = DAILY_MISSIONS.get(mission_id)
+        if mission is None and mission_id.startswith("admin-"):
+            try:
+                custom_id = int(mission_id.removeprefix("admin-"))
+            except ValueError as error:
+                raise ValueError("La misión no es válida.") from error
+            if mission_id != f"admin-{custom_id}":
+                raise ValueError("La misión no es válida.")
+            with database() as connection:
+                custom_mission = connection.execute(
+                    "SELECT points, coins FROM missions WHERE id = ? AND active = 1",
+                    (custom_id,),
+                ).fetchone()
+            if custom_mission is not None:
+                mission = {
+                    "action": "complete",
+                    "points": custom_mission["points"],
+                    "coins": custom_mission["coins"],
+                }
         if mission is None or mission["action"] not in {"complete", "route"}:
             raise ValueError("Esa misión se completa realizando su actividad.")
 
@@ -600,7 +830,328 @@ class CivicMxHandler(BaseHTTPRequestHandler):
                 "progress": int(completed),
                 "total": 1,
             })
+        with database() as connection:
+            custom_missions = connection.execute(
+                "SELECT id, title, description, icon, points, coins FROM missions WHERE active = 1 ORDER BY created_at DESC"
+            ).fetchall()
+        for mission in custom_missions:
+            event_key = f"mission:admin-{mission['id']}:{today}"
+            completed = event_key in completed_keys
+            missions.append({
+                "id": f"admin-{mission['id']}",
+                "title": mission["title"],
+                "description": mission["description"],
+                "icon": mission["icon"],
+                "points": mission["points"],
+                "coins": mission["coins"],
+                "action": "complete",
+                "completed": completed,
+                "progress": int(completed),
+                "total": 1,
+            })
         return missions
+
+    def admin_overview(self) -> None:
+        actor = self.require_staff()
+        if actor is None:
+            return
+        today = self.today_date()
+        week_start = (datetime.fromisoformat(today).date() - timedelta(days=6)).isoformat()
+        month_start = (datetime.fromisoformat(today).date() - timedelta(days=29)).isoformat()
+        with database() as connection:
+            users_total = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+            active_users = connection.execute(
+                "SELECT COUNT(DISTINCT user_id) FROM activity_events WHERE event_date >= ?",
+                (month_start,),
+            ).fetchone()[0]
+            reports_total = connection.execute(
+                "SELECT COUNT(*) FROM posts WHERE kind = 'report'"
+            ).fetchone()[0]
+            reports_today = connection.execute(
+                "SELECT COUNT(*) FROM posts WHERE kind = 'report' AND substr(created_at, 1, 10) = ?", (today,)
+            ).fetchone()[0]
+            reports_week = connection.execute(
+                "SELECT COUNT(*) FROM posts WHERE kind = 'report' AND substr(created_at, 1, 10) >= ?", (week_start,)
+            ).fetchone()[0]
+            alerts_total = connection.execute("SELECT COUNT(*) FROM security_alerts").fetchone()[0]
+            missions_total = connection.execute("SELECT COUNT(*) FROM missions WHERE active = 1").fetchone()[0]
+            categories = connection.execute(
+                """SELECT category, COUNT(*) AS count FROM posts WHERE kind = 'report'
+                   GROUP BY category ORDER BY count DESC"""
+            ).fetchall()
+            report_rows = connection.execute(
+                """SELECT posts.id,
+                          CASE WHEN posts.anonymous = 1 THEN 'Anónimo' ELSE users.name END AS author,
+                          CASE WHEN posts.anonymous = 1 THEN '' ELSE users.email END AS email,
+                          CASE WHEN posts.anonymous = 1 THEN '' ELSE users.avatar_url END AS avatar_url,
+                          posts.title, posts.description, posts.kind, posts.category, posts.latitude, posts.longitude,
+                          posts.status, posts.image_url, posts.created_at,
+                          0 AS is_demo
+                   FROM posts JOIN users ON users.id = posts.user_id WHERE posts.kind = 'report'
+                   UNION ALL
+                   SELECT 'demo-' || id AS id, 'DEMO' AS author, '' AS email, '' AS avatar_url,
+                          title, description, 'report' AS kind,
+                          category, latitude, longitude, 'Demostración' AS status, '' AS image_url,
+                          created_at, 1 AS is_demo
+                   FROM demo_reports
+                   ORDER BY created_at DESC"""
+            ).fetchall()
+            community_post_rows = connection.execute(
+                """SELECT posts.id, users.name AS author, users.avatar_url, posts.title,
+                          posts.description, posts.category, posts.image_url, posts.created_at
+                   FROM posts JOIN users ON users.id = posts.user_id
+                   WHERE posts.kind = 'post' ORDER BY posts.created_at DESC"""
+            ).fetchall() if actor["role"] == "admin" else []
+            alert_rows = connection.execute(
+                """SELECT security_alerts.id, users.name AS author, users.email, alert_type,
+                          latitude, longitude, security_alerts.created_at AS created_at
+                   FROM security_alerts JOIN users ON users.id = security_alerts.user_id
+                   ORDER BY security_alerts.created_at DESC LIMIT 200"""
+            ).fetchall()
+            mission_rows = connection.execute(
+                """SELECT id, title, description, icon, points, coins, active, created_at
+                   FROM missions ORDER BY created_at DESC"""
+            ).fetchall()
+            if actor["role"] != "admin":
+                mission_rows = []
+            trend_rows = connection.execute(
+                """SELECT substr(created_at, 1, 10) AS day, COUNT(*) AS count FROM posts
+                   WHERE kind = 'report' AND substr(created_at, 1, 10) >= ? GROUP BY day""",
+                (week_start,),
+            ).fetchall()
+            user_rows = connection.execute(
+                """SELECT id, name, email, role, avatar_url, created_at
+                   FROM users ORDER BY created_at DESC"""
+            ).fetchall() if actor["role"] == "admin" else []
+        trend_counts = {row["day"]: row["count"] for row in trend_rows}
+        today_date = datetime.fromisoformat(today).date()
+        trend = [
+            {
+                "date": (today_date - timedelta(days=offset)).isoformat(),
+                "count": trend_counts.get((today_date - timedelta(days=offset)).isoformat(), 0),
+            }
+            for offset in range(6, -1, -1)
+        ]
+        self.send_json({
+            "stats": {
+                "users": users_total,
+                "active_users_30d": active_users,
+                "reports": reports_total,
+                "reports_today": reports_today,
+                "reports_week": reports_week,
+                "alerts": alerts_total,
+                "missions": missions_total,
+            },
+            "reports_by_category": [dict(row) for row in categories],
+            "report_trend": trend,
+            "reports": [dict(row) for row in report_rows],
+            "community_posts": [dict(row) for row in community_post_rows],
+            "alerts": [dict(row) for row in alert_rows],
+            "users": [dict(row) for row in user_rows],
+            "missions": [dict(row) for row in mission_rows],
+        })
+
+    def admin_users(self) -> None:
+        user = self.require_admin()
+        if user is None:
+            return
+        with database() as connection:
+            rows = connection.execute(
+                """SELECT id, name, email, role, avatar_url, created_at
+                   FROM users ORDER BY created_at DESC"""
+            ).fetchall()
+        self.send_json({"users": [dict(row) for row in rows]})
+
+    def create_admin_user(self) -> None:
+        if self.require_admin() is None:
+            return
+        data = self.read_json()
+        name = self.text_field(data, "name", "El nombre es obligatorio.").strip()
+        email = self.text_field(data, "email", "El correo es obligatorio.").strip().lower()
+        password = self.text_field(data, "password", "La contraseña es obligatoria.")
+        role = self.text_field(data, "role", "El rol no es válido.")
+        avatar_url = self.validate_avatar_url(data.get("avatar_url", ""))
+        if not 3 <= len(name) <= 80:
+            raise ValueError("El nombre debe tener entre 3 y 80 caracteres.")
+        if len(email) > 254 or not EMAIL_PATTERN.fullmatch(email):
+            raise ValueError("Ingresa un correo válido.")
+        if not 8 <= len(password) <= 256:
+            raise ValueError("La contraseña debe tener al menos 8 caracteres.")
+        if role not in {"admin", "moderator"}:
+            raise ValueError("El personal debe tener rol de administrador o moderador.")
+        salt = secrets.token_bytes(16)
+        created_at = now_utc().isoformat(timespec="seconds")
+        with database() as connection:
+            cursor = connection.execute(
+                """INSERT INTO users (name, email, role, avatar_url, password_salt, password_hash, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (name, email, role, avatar_url, salt, hash_password(password, salt), created_at),
+            )
+            new_user_id = cursor.lastrowid
+            row = connection.execute(
+                """SELECT id, name, email, role, avatar_url, created_at
+                   FROM users WHERE id = ?""",
+                (new_user_id,),
+            ).fetchone()
+        self.send_json({"user": dict(row)}, 201)
+
+    def update_admin_user(self, user_id: str, field: str) -> None:
+        actor = self.require_admin()
+        if actor is None:
+            return
+        if not user_id.isdecimal():
+            self.send_json({"error": "No se encontró esa cuenta."}, 404)
+            return
+        data = self.read_json()
+        with database() as connection:
+            target = connection.execute(
+                "SELECT id, role FROM users WHERE id = ?", (int(user_id),)
+            ).fetchone()
+            if target is None:
+                self.send_json({"error": "No se encontró esa cuenta."}, 404)
+                return
+            if field == "role":
+                role = self.text_field(data, "role", "El rol no es válido.")
+                if role not in {"user", "moderator", "admin"}:
+                    raise ValueError("Selecciona usuario, moderador o administrador.")
+                if target["id"] == actor["id"] and role != "admin":
+                    raise ValueError("No puedes retirar tus propios permisos de administrador.")
+                if target["role"] == "admin" and role != "admin":
+                    total_admins = connection.execute(
+                        "SELECT COUNT(*) FROM users WHERE role = 'admin'"
+                    ).fetchone()[0]
+                    if total_admins <= 1:
+                        raise ValueError("Debe quedar al menos una cuenta con control total.")
+                connection.execute("UPDATE users SET role = ? WHERE id = ?", (role, int(user_id)))
+                result = {"role": role}
+            else:
+                avatar_url = self.validate_avatar_url(data.get("avatar_url", ""))
+                connection.execute("UPDATE users SET avatar_url = ? WHERE id = ?", (avatar_url, int(user_id)))
+                result = {"avatar_url": avatar_url}
+        self.send_json({"user_id": int(user_id), **result})
+
+    @staticmethod
+    def validate_avatar_url(value: object) -> str:
+        if not isinstance(value, str):
+            raise ValueError("La dirección de la foto no es válida.")
+        avatar_url = value.strip()
+        if not avatar_url:
+            return ""
+        if re.fullmatch(r"/uploads/[a-f0-9]{40}\.(?:jpg|png|webp)", avatar_url):
+            if (ROOT / avatar_url.lstrip("/")).is_file():
+                return avatar_url
+            raise ValueError("No se encontró la foto cargada.")
+        parsed_url = urllib.parse.urlsplit(avatar_url)
+        if len(avatar_url) > 500 or parsed_url.scheme != "https" or not parsed_url.netloc:
+            raise ValueError("La foto debe usar una dirección HTTPS válida.")
+        return avatar_url
+
+    def update_admin_post_status(self, post_id: str) -> None:
+        if self.require_staff() is None:
+            return
+        if not post_id.isdecimal():
+            self.send_json({"error": "No se encontró ese reporte."}, 404)
+            return
+        data = self.read_json()
+        status = self.text_field(data, "status", "El estado no es válido.")
+        allowed_statuses = {"Pendiente", "En revisión", "Atendido", "Descartado"}
+        if status not in allowed_statuses:
+            raise ValueError("Selecciona un estado válido para el reporte.")
+        with database() as connection:
+            cursor = connection.execute(
+                "UPDATE posts SET status = ? WHERE id = ? AND kind = 'report'",
+                (status, int(post_id)),
+            )
+        if cursor.rowcount == 0:
+            self.send_json({"error": "No se encontró ese reporte."}, 404)
+            return
+        self.send_json({"id": int(post_id), "status": status})
+
+    def create_admin_mission(self) -> None:
+        if self.require_admin() is None:
+            return
+        data = self.read_json()
+        title = self.text_field(data, "title", "El título es obligatorio.").strip()
+        description = self.text_field(data, "description", "La descripción es obligatoria.").strip()
+        icon = self.text_field(data, "icon", "El ícono no es válido.").strip()
+        points = data.get("points")
+        coins = data.get("coins")
+        allowed_icons = {"bi-flag-fill", "bi-shield-check", "bi-map", "bi-people-fill"}
+        if not 3 <= len(title) <= 80:
+            raise ValueError("El título debe tener entre 3 y 80 caracteres.")
+        if not 1 <= len(description) <= 500:
+            raise ValueError("La descripción debe tener entre 1 y 500 caracteres.")
+        if icon not in allowed_icons:
+            raise ValueError("El ícono seleccionado no es válido.")
+        if isinstance(points, bool) or not isinstance(points, int) or not 0 <= points <= 1000:
+            raise ValueError("Los puntos deben ser un número entre 0 y 1000.")
+        if isinstance(coins, bool) or not isinstance(coins, int) or not 0 <= coins <= 1000:
+            raise ValueError("Las monedas deben ser un número entre 0 y 1000.")
+        created_at = now_utc().isoformat(timespec="seconds")
+        with database() as connection:
+            cursor = connection.execute(
+                """INSERT INTO missions (title, description, icon, points, coins, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (title, description, icon, points, coins, created_at),
+            )
+        self.send_json({
+            "mission": {
+                "id": cursor.lastrowid,
+                "title": title,
+                "description": description,
+                "icon": icon,
+                "points": points,
+                "coins": coins,
+                "active": 1,
+                "created_at": created_at,
+            }
+        }, 201)
+
+    def delete_admin_post(self, post_id: str) -> None:
+        if self.require_admin() is None:
+            return
+        if not post_id.isdecimal():
+            self.send_json({"error": "No se encontró esa publicación."}, 404)
+            return
+        with database() as connection:
+            cursor = connection.execute("DELETE FROM posts WHERE id = ?", (int(post_id),))
+        if cursor.rowcount == 0:
+            self.send_json({"error": "No se encontró esa publicación."}, 404)
+            return
+        self.send_json({"deleted": True})
+
+    def delete_admin_mission(self, mission_id: str) -> None:
+        if self.require_admin() is None:
+            return
+        if not mission_id.isdecimal():
+            self.send_json({"error": "No se encontró esa misión."}, 404)
+            return
+        with database() as connection:
+            cursor = connection.execute("DELETE FROM missions WHERE id = ?", (int(mission_id),))
+        if cursor.rowcount == 0:
+            self.send_json({"error": "No se encontró esa misión."}, 404)
+            return
+        self.send_json({"deleted": True})
+
+    def require_admin(self) -> dict | None:
+        user = self.current_user()
+        if user is None:
+            self.send_json({"error": "Inicia sesión para acceder al panel administrativo."}, 401)
+            return None
+        if user["role"] != "admin":
+            self.send_json({"error": "Tu cuenta no tiene permisos administrativos."}, 403)
+            return None
+        return user
+
+    def require_staff(self) -> dict | None:
+        user = self.current_user()
+        if user is None:
+            self.send_json({"error": "Inicia sesión para acceder al panel administrativo."}, 401)
+            return None
+        if user["role"] not in {"admin", "moderator"}:
+            self.send_json({"error": "Tu cuenta no tiene permisos de personal."}, 403)
+            return None
+        return user
 
     def get_dashboard(self, user: dict) -> dict:
         today = self.today_date()
@@ -680,6 +1231,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
             },
             "streak": {"days": streak, "week": week_days},
             "achievements": achievements,
+            "activities": [dict(row) for row in events],
         }
 
     @staticmethod
@@ -703,12 +1255,12 @@ class CivicMxHandler(BaseHTTPRequestHandler):
         )
         return cursor.rowcount == 1
 
-    def read_json(self) -> dict:
+    def read_json(self, max_bytes: int = 16_384) -> dict:
         try:
             length = int(self.headers.get("Content-Length", "0"))
         except ValueError as error:
             raise ValueError("Solicitud no válida.") from error
-        if length <= 0 or length > 16_384:
+        if length <= 0 or length > max_bytes:
             raise ValueError("El contenido de la solicitud no es válido.")
         data = json.loads(self.rfile.read(length).decode("utf-8"))
         if not isinstance(data, dict):
@@ -739,7 +1291,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
         token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
         with database() as connection:
             row = connection.execute(
-                """SELECT users.id, users.name, users.email, users.business_name
+                """SELECT users.id, users.name, users.email, users.business_name, users.role, users.avatar_url
                    FROM sessions JOIN users ON users.id = sessions.user_id
                    WHERE sessions.token_hash = ? AND sessions.expires_at > ?""",
                 (token_hash, now_utc().isoformat(timespec="seconds")),
@@ -787,9 +1339,13 @@ class CivicMxHandler(BaseHTTPRequestHandler):
         body = file_path.read_bytes()
         content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
         self.send_response(200)
-        self.send_header("Content-Type", f"{content_type}; charset=utf-8")
+        charset = "; charset=utf-8" if content_type.startswith("text/") or content_type in {
+            "application/javascript", "application/json"
+        } else ""
+        self.send_header("Content-Type", f"{content_type}{charset}")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-cache")
+        self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
         self.wfile.write(body)
 
@@ -810,7 +1366,7 @@ class CivicMxHandler(BaseHTTPRequestHandler):
 
 def main() -> None:
     initialize_database()
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), CivicMxHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", PORT), CivicMxHandler)
     print(f"HeroesMX disponible en http://localhost:{PORT}")
     print(f"Base de datos local: {DB_PATH}")
     try:

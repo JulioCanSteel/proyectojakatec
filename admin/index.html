@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1557a6">
+    <title>Panel administrativo | HeroesMX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="sidebar">
+            <a class="brand" href="/admin/index.html">
+                <span class="brand-mark"><i class="bi bi-shield-check"></i></span>
+                <span><strong>HeroesMX</strong><small>Administración</small></span>
+            </a>
+            <div class="workspace-label">CENTRO DE CONTROL</div>
+            <nav class="side-nav" aria-label="Administración">
+                <button class="nav-link active" data-view="overview"><i class="bi bi-grid-1x2"></i>Resumen</button>
+                <button class="nav-link" data-view="reports"><i class="bi bi-clipboard-data"></i>Reportes <span class="nav-count" id="reportNavCount">0</span></button>
+                <button class="nav-link" data-view="map"><i class="bi bi-map"></i>Mapa operativo</button>
+                <button class="nav-link admin-only" data-view="missions"><i class="bi bi-trophy"></i>Misiones</button>
+                <button class="nav-link admin-only" data-view="publish"><i class="bi bi-megaphone"></i>Publicaciones</button>
+                <button class="nav-link admin-only" data-view="users"><i class="bi bi-person-gear"></i>Usuarios y permisos</button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="secure-note"><i class="bi bi-lock-fill"></i><span>Acceso restringido<br>Personal autorizado</span></div>
+                <a href="/feed/index.html" class="return-link"><i class="bi bi-arrow-left"></i> Volver a HeroesMX</a>
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            <header class="topbar">
+                <div class="mobile-brand"><i class="bi bi-shield-check"></i> HeroesMX <span>Admin</span></div>
+                <div class="breadcrumb-label"><span>Operaciones</span><i class="bi bi-chevron-right"></i><strong id="currentSection">Resumen</strong></div>
+                <div class="top-actions">
+                    <span class="live-status"><span></span>Panel operativo</span>
+                    <div class="admin-profile"><span class="avatar" id="adminAvatar"><span id="adminInitials">A</span></span><span id="adminName">Administración</span></div>
+                    <button class="icon-button" id="logoutButton" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></button>
+                </div>
+            </header>
+            <nav class="mobile-nav" aria-label="Secciones administrativas">
+                <button class="nav-link active" data-view="overview"><i class="bi bi-grid-1x2"></i>Resumen</button>
+                <button class="nav-link" data-view="reports"><i class="bi bi-clipboard-data"></i>Reportes</button>
+                <button class="nav-link" data-view="map"><i class="bi bi-map"></i>Mapa</button>
+                <button class="nav-link admin-only" data-view="missions"><i class="bi bi-trophy"></i>Misiones</button>
+                <button class="nav-link admin-only" data-view="publish"><i class="bi bi-megaphone"></i>Publicar</button>
+                <button class="nav-link admin-only" data-view="users"><i class="bi bi-person-gear"></i>Equipo</button>
+            </nav>
+
+            <div class="content-wrap">
+                <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+                <section class="view active" id="view-overview">
+                    <div class="page-heading">
+                        <div><span class="eyebrow">HEROESMX · GESTIÓN</span><h1>Resumen operativo</h1><p>Actividad comunitaria, reportes y participación en un solo lugar.</p></div>
+                        <button class="btn btn-outline-primary" id="refreshButton" type="button"><i class="bi bi-arrow-clockwise me-2"></i>Actualizar</button>
+                    </div>
+                    <div class="stats-grid">
+                        <article class="stat-card"><div class="stat-icon blue"><i class="bi bi-people"></i></div><span>Personas registradas</span><strong id="statUsers">—</strong><small id="statActiveUsers">— activas en 30 días</small></article>
+                        <article class="stat-card"><div class="stat-icon amber"><i class="bi bi-clipboard2-check"></i></div><span>Reportes comunitarios</span><strong id="statReports">—</strong><small id="statReportsToday">— nuevos hoy</small></article>
+                        <article class="stat-card"><div class="stat-icon green"><i class="bi bi-bell"></i></div><span>Alertas de seguridad</span><strong id="statAlerts">—</strong><small>Alertas registradas por usuarios</small></article>
+                        <article class="stat-card"><div class="stat-icon violet"><i class="bi bi-trophy"></i></div><span>Misiones activas</span><strong id="statMissions">—</strong><small>Disponibles para la comunidad</small></article>
+                    </div>
+                    <div class="chart-grid">
+                        <article class="panel-card"><div class="panel-heading"><div><h2>Reportes recibidos</h2><p>Últimos siete días</p></div><span class="heading-icon"><i class="bi bi-graph-up"></i></span></div><div class="chart-area"><canvas id="trendChart" aria-label="Gráfica de reportes durante los últimos siete días"></canvas></div></article>
+                        <article class="panel-card"><div class="panel-heading"><div><h2>Tipos de reporte</h2><p>Distribución por categoría</p></div><span class="heading-icon"><i class="bi bi-pie-chart"></i></span></div><div class="chart-area doughnut-area"><canvas id="categoryChart" aria-label="Distribución de reportes por categoría"></canvas></div></article>
+                    </div>
+                    <article class="panel-card recent-panel"><div class="panel-heading"><div><h2>Reportes recientes</h2><p>Los últimos aportes de la comunidad</p></div><button class="text-action" type="button" data-goto="reports">Ver todos <i class="bi bi-arrow-right"></i></button></div><div id="recentReports" class="recent-list"></div></article>
+                </section>
+
+                <section class="view" id="view-reports">
+                    <div class="page-heading"><div><span class="eyebrow">MODERACIÓN</span><h1>Reportes comunitarios</h1><p>Consulta, filtra y modera publicaciones y reportes recibidos.</p></div><button class="btn btn-primary admin-only" type="button" data-goto="publish"><i class="bi bi-plus-lg me-2"></i>Nueva publicación</button></div>
+                    <div class="filter-bar panel-card"><label class="search-box"><i class="bi bi-search"></i><input id="reportSearch" type="search" placeholder="Buscar por texto o autor" aria-label="Buscar reportes"></label><select class="form-select" id="categoryFilter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option></select><span class="result-count" id="reportResultCount">0 reportes</span></div>
+                    <div id="reportsList" class="reports-list"></div>
+                </section>
+
+                <section class="view" id="view-map">
+                    <div class="page-heading"><div><span class="eyebrow">INTELIGENCIA TERRITORIAL</span><h1>Mapa operativo</h1><p>La intensidad del calor representa la cantidad de reportes cercanos. Selecciona un punto para gestionar su estado.</p></div><div class="map-legend"><span class="heat-legend"><i></i>Menos reportes <b>Más reportes</b></span></div></div>
+                    <div class="map-workspace">
+                        <article class="panel-card map-panel"><div id="adminMap" role="region" aria-label="Mapa de calor de reportes comunitarios"></div><div class="map-caption"><i class="bi bi-info-circle"></i> Los puntos DEMO son datos sintéticos y no representan incidentes reales. Las alertas se distinguen de los reportes.</div></article>
+                        <aside class="panel-card map-inspector" id="mapInspector" aria-live="polite"><div class="inspector-empty"><i class="bi bi-crosshair"></i><strong>Selecciona un punto del mapa</strong><span>Consulta los detalles del reporte y actualiza su estado.</span></div></aside>
+                    </div>
+                    <div class="map-summary"><article class="panel-card"><i class="bi bi-geo-alt"></i><div><strong id="mappedReports">0</strong><span>Reportes geolocalizados</span></div></article><article class="panel-card"><i class="bi bi-bell"></i><div><strong id="mappedAlerts">0</strong><span>Alertas geolocalizadas</span></div></article></div>
+                    <article class="panel-card alerts-panel"><div class="panel-heading"><div><h2>Alertas recientes</h2><p>Registros enviados desde la app; esta plataforma no contacta a servicios de emergencia.</p></div><span class="heading-icon alert-heading-icon"><i class="bi bi-bell"></i></span></div><div id="alertsList" class="recent-list"></div></article>
+                </section>
+
+                <section class="view" id="view-missions">
+                    <div class="page-heading"><div><span class="eyebrow">PARTICIPACIÓN</span><h1>Misiones de la comunidad</h1><p>Crea desafíos y recompensas que aparecerán en la sección Misiones de la app.</p></div></div>
+                    <div class="mission-layout">
+                        <article class="panel-card mission-form-card"><div class="panel-heading"><div><h2>Crear misión</h2><p>La misión se publica inmediatamente.</p></div><span class="heading-icon"><i class="bi bi-plus-circle"></i></span></div>
+                            <form id="missionForm">
+                                <label class="form-label" for="missionTitle">Nombre de la misión</label><input class="form-control" id="missionTitle" maxlength="80" required placeholder="Ej. Comparte una recomendación segura">
+                                <label class="form-label mt-3" for="missionDescription">Descripción e instrucciones</label><textarea class="form-control" id="missionDescription" rows="3" maxlength="500" required placeholder="Describe qué debe hacer la comunidad"></textarea>
+                                <div class="row g-3 mt-0"><div class="col-6"><label class="form-label" for="missionPoints">Puntos</label><input class="form-control" id="missionPoints" type="number" min="0" max="1000" value="10" required></div><div class="col-6"><label class="form-label" for="missionCoins">Monedas</label><input class="form-control" id="missionCoins" type="number" min="0" max="1000" value="10" required></div></div>
+                                <label class="form-label mt-3" for="missionIcon">Icono</label><select class="form-select" id="missionIcon"><option value="bi-flag-fill">Bandera</option><option value="bi-shield-check">Seguridad</option><option value="bi-map">Mapa</option><option value="bi-people-fill">Comunidad</option></select>
+                                <button class="btn btn-primary w-100 mt-4" type="submit"><i class="bi bi-plus-lg me-2"></i>Publicar misión</button>
+                            </form>
+                            <div class="form-footnote"><i class="bi bi-arrow-repeat"></i> Las misiones se reinician para cada persona cada día.</div>
+                        </article>
+                        <article class="panel-card mission-list-card"><div class="panel-heading"><div><h2>Misiones publicadas</h2><p>Gestiona los desafíos creados por administración.</p></div><span class="count-pill" id="missionCount">0</span></div><div id="missionsList" class="mission-list"></div></article>
+                    </div>
+                </section>
+
+                <section class="view" id="view-publish">
+                    <div class="page-heading"><div><span class="eyebrow">COMUNICACIÓN OFICIAL</span><h1>Crear publicación</h1><p>Comparte avisos y novedades directamente en el feed comunitario.</p></div></div>
+                    <article class="panel-card publish-card">
+                        <div class="publish-intro"><span class="publish-icon"><i class="bi bi-megaphone-fill"></i></span><div><h2>Nueva publicación de HeroesMX</h2><p>El contenido se mostrará como publicado y con autoría administrativa.</p></div></div>
+                        <form id="publishForm">
+                            <label class="form-label" for="postTitle">Título</label><input class="form-control" id="postTitle" maxlength="120" required placeholder="Escribe un título claro">
+                            <label class="form-label mt-3" for="postCategory">Categoría</label><select class="form-select" id="postCategory"><option value="General">Aviso general</option><option value="Seguridad">Seguridad</option><option value="Comunidad">Comunidad</option><option value="Robo / asalto">Robo / asalto</option><option value="Accidente vial">Accidente vial</option><option value="Alumbrado">Alumbrado</option><option value="Vandalismo">Vandalismo</option></select>
+                            <label class="form-label mt-3" for="postDescription">Contenido</label><textarea class="form-control" id="postDescription" rows="7" maxlength="2000" required placeholder="Redacta la información para la comunidad"></textarea>
+                            <label class="form-label mt-3" for="postImage">Foto (opcional, JPG/PNG/WebP, hasta 5 MB)</label><input class="form-control" id="postImage" type="file" accept="image/jpeg,image/png,image/webp">
+                            <img class="admin-post-image-preview" id="postImagePreview" alt="Vista previa de la foto" hidden>
+                            <div class="publish-footer"><span><i class="bi bi-eye"></i> Visible para toda la comunidad</span><button class="btn btn-primary" type="submit"><i class="bi bi-send me-2"></i>Publicar ahora</button></div>
+                        </form>
+                    </article>
+                    <article class="panel-card admin-community-posts">
+                        <div class="panel-heading"><div><h2>Publicaciones de la comunidad</h2><p>Administra las publicaciones sociales del feed. Los reportes se gestionan por separado.</p></div><span class="count-pill" id="communityPostCount">0</span></div>
+                        <div id="adminPostsList" class="admin-post-list"></div>
+                    </article>
+                </section>
+                <section class="view" id="view-users">
+                    <div class="page-heading"><div><span class="eyebrow">CONTROL DE ACCESO</span><h1>Usuarios y permisos</h1><p>Asigna responsabilidades, gestiona fotos de perfil y crea cuentas de personal.</p></div></div>
+                    <div class="mission-layout user-admin-layout">
+                        <article class="panel-card mission-form-card"><div class="panel-heading"><div><h2>Agregar personal</h2><p>El personal puede iniciar sesión inmediatamente.</p></div><span class="heading-icon"><i class="bi bi-person-plus"></i></span></div>
+                            <form id="staffForm">
+                                <label class="form-label" for="staffName">Nombre completo</label><input class="form-control" id="staffName" maxlength="80" required>
+                                <label class="form-label mt-3" for="staffEmail">Correo de acceso</label><input class="form-control" id="staffEmail" type="email" maxlength="254" required>
+                                <label class="form-label mt-3" for="staffPassword">Contraseña temporal</label><input class="form-control" id="staffPassword" type="password" minlength="8" maxlength="256" autocomplete="new-password" required>
+                                <label class="form-label mt-3" for="staffRole">Nivel de acceso</label><select class="form-select" id="staffRole"><option value="moderator">Moderador · reportes y mapa</option><option value="admin">Administrador · control total</option></select>
+                                <label class="form-label mt-3" for="staffAvatar">Foto de perfil · URL HTTPS opcional</label><input class="form-control" id="staffAvatar" type="url" placeholder="https://ejemplo.mx/foto.jpg">
+                                <button class="btn btn-primary w-100 mt-4" type="submit"><i class="bi bi-person-plus me-2"></i>Crear cuenta de personal</button>
+                            </form>
+                            <div class="form-footnote"><i class="bi bi-shield-lock"></i> Solo los administradores con control total pueden administrar permisos.</div>
+                        </article>
+                        <article class="panel-card user-list-card"><div class="panel-heading"><div><h2>Cuentas y roles</h2><p>Las fotos deben ser enlaces seguros HTTPS.</p></div><span class="count-pill" id="userCount">0</span></div><div id="usersList" class="user-list"></div></article>
+                    </div>
+                </section>
+                <footer class="page-footer">HeroesMX · Panel administrativo <span>Datos comunitarios para gestión informativa.</span></footer>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="../auth.js"></script>
+    <script src="./script.js"></script>
+</body>
+</html>
